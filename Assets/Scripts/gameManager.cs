@@ -11,6 +11,12 @@ public class gameManager : MonoBehaviour {
 	void Start () {
 		
 	}
+
+	public int TurnColor {
+		get {
+			return turnColor;
+		}
+	}
 	
 	// Update is called once per frame
 	void Update () {

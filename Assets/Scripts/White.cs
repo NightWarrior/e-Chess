@@ -113,7 +113,7 @@ public class White : MonoBehaviour {
 				
 			yield return null;
 		}
-		Debug.Log("check: " + GameObject.Find ("Board").GetComponent<board> ().isCheck(0+0));
+		Debug.Log("White: check: " + GameObject.Find ("Board").GetComponent<board> ().isCheck(0+0));
 
 	}
 

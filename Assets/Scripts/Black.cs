@@ -114,7 +114,7 @@ public class Black : MonoBehaviour {
 
 			yield return null;
 		}
-		Debug.Log("check: " + GameObject.Find ("Board").GetComponent<board> ().isCheck(1));
+		Debug.Log("Black: check: " + GameObject.Find ("Board").GetComponent<board> ().isCheck(1));
 	}
 
 	public UnitType getUnitTypeAtPosition(Vector3 pos){
