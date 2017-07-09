@@ -44,55 +44,6 @@ public class board : MonoBehaviour {
 		
 	}
 
-	/*
-	public void whiteClick(Vector3 pos1){
-
-		UnitType unitType = GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition(pos1);
-		if (unitType != UnitType.NULL) {
-			removeHighlights ();
-			highLightMoveLocations (unitType, pos1);
-			unitUnderHighlight = new Vector3(pos1.x, pos1.y, pos1.z);
-		}
-		else {
-			Debug.Log ("non unit");
-			if (checkHightlighted (pos1)) {
-				removeHighlights ();
-				Debug.Log ("highlighted");
-				if (checkHitableEnemy (pos1)) {
-					GameObject.Find ("Black").GetComponent<Black> ().removeUnit (pos1);
-				}
-				GameObject.Find ("White").GetComponent<White> ().moveObjectAtLocationTo(unitUnderHighlight, pos1);
-
-			}
-		}
-
-	}
-
-	public void blackClick(Vector3 pos1){
-		UnitType unitType = GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition(pos1);
-		if (unitType != UnitType.NULL) {
-			removeHighlights ();
-			highLightMoveLocations (unitType, pos1);
-			unitUnderHighlight = new Vector3(pos1.x, pos1.y, pos1.z);
-			Debug.Log (unitUnderHighlight);
-		}
-		else {
-			Debug.Log ("non unit");
-			if (checkHightlighted (pos1)) {
-				removeHighlights ();
-				Debug.Log ("highlighted");
-				if (checkHitableEnemy (pos1)) {
-					GameObject.Find ("White").GetComponent<White> ().removeUnit (pos1);
-				}
-				GameObject.Find ("Black").GetComponent<Black> ().moveObjectAtLocationTo(unitUnderHighlight, pos1);
-
-			}
-		}
-
-	}
-	*/
-
-
 	public Vector3 getTilePos (int x, int z) { 
 		Vector3 pos;
 		pos = rows [x, z].GetComponent<Transform> ().position;
@@ -909,11 +860,13 @@ public class board : MonoBehaviour {
 						color.a = (1f/255f*150f);
 						highlight.GetComponent<Renderer> ().sharedMaterial.color = color;
 
+						removeHighlights ();
 						return false;
 					}
 				}
 			}
 		}
+		removeHighlights ();
 
 
 
@@ -921,7 +874,45 @@ public class board : MonoBehaviour {
 		color.a = (1f/255f*150f);
 		highlight.GetComponent<Renderer> ().sharedMaterial.color = color;
 
-		return false;
+		return true;
+	}
+
+	public bool isBlackCheckmate(){
+
+		// make highlights invisible
+		Color color = highlight.GetComponent<Renderer> ().sharedMaterial.color;
+		color.a = 0;
+		highlight.GetComponent<Renderer> ().sharedMaterial.color = color;
+		UnitType ut = UnitType.NULL;
+
+
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				ut = GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (new Vector3 (i, 0, j));
+				if (ut != UnitType.NULL) {
+					removeHighlights ();
+					highLightMoveLocations(ut, new Vector3(i, 0, j), -1); // face is 1 for white, -1 for black
+
+					if (highlightCount != 0) {
+						// make highlights visible again
+						color.a = (1f/255f*150f);
+						highlight.GetComponent<Renderer> ().sharedMaterial.color = color;
+
+						removeHighlights ();
+						return false;
+					}
+				}
+			}
+		}
+		removeHighlights ();
+
+
+
+		// make highlights visible again
+		color.a = (1f/255f*150f);
+		highlight.GetComponent<Renderer> ().sharedMaterial.color = color;
+
+		return true;
 	}
 
 }

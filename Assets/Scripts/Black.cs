@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Black : MonoBehaviour {
 
@@ -25,7 +26,7 @@ public class Black : MonoBehaviour {
 	public float speed;
 
 
-	Vector3 trash = new Vector3(-5, 0, -5);
+	Vector3 trash = new Vector3 (-5, 0, -5);
 
 
 	// Use this for initialization
@@ -36,33 +37,9 @@ public class Black : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-
-
-		// get tile location and move
-		/*Vector3 pos = GameObject.Find ("Board").GetComponent<board> ().getTilePos (0, 2);
-
-		if(Input.GetMouseButtonDown(0)){ // TODO: Add coroutine for movement...
-			float timePassed = 0;
-			while (timePassed < 1.0f) {
-				// Increment the time to prevent an infinite loop
-				timePassed += Time.deltaTime; 
-				// Slowly adjust the position and rotation so it approaches the spawn position and rotation
-				//transform.position += deltaPos * Time.deltaTime;
-				pawn1.GetComponent<Transform>().position = Vector3.MoveTowards(pawn1.GetComponent<Transform>().position, pos, Time.deltaTime);
-			}
-
-			Debug.Log (pos);
-
-
-			//float step = speed * Time.deltaTime;
-			//pawn1.GetComponent<Transform>().Translate(new Vector3(pos.x, pawn1.GetComponent<Transform>().position.y, pos.y));
-			Debug.Log (pawn1.GetComponent<Transform>().position.x + " " + pawn1.GetComponent<Transform>().position.z);
-		
-		}
-		*/
 	}
 
-	public void moveObjectAtLocationTo(Vector3 pos, Vector3 pos2){
+	public void moveObjectAtLocationTo (Vector3 pos, Vector3 pos2) {
 
 
 		if (pawn1.transform.position.Equals (pos))
@@ -100,14 +77,14 @@ public class Black : MonoBehaviour {
 
 	}
 
-	IEnumerator smoothMoveToLocationRoutine(Vector3 pos1, Vector3 pos2, GameObject obj){
+	IEnumerator smoothMoveToLocationRoutine (Vector3 pos1, Vector3 pos2, GameObject obj) {
 		float t = 0.0f;
 
-		while(obj.transform.position != pos2){
+		while (obj.transform.position != pos2) {
 
-			obj.transform.position = new Vector3 (	Mathf.Lerp(pos1.x, pos2.x, t) ,
-				Mathf.Lerp(pos1.y, pos2.y, t) ,
-				Mathf.Lerp(pos1.z, pos2.z, t) );
+			obj.transform.position = new Vector3 (Mathf.Lerp (pos1.x, pos2.x, t),
+				Mathf.Lerp (pos1.y, pos2.y, t),
+				Mathf.Lerp (pos1.z, pos2.z, t));
 
 
 			t += speed * Time.deltaTime;
@@ -116,13 +93,17 @@ public class Black : MonoBehaviour {
 		}
 
 		BoardStructure bs = new BoardStructure ();
-		bs.isWhiteCheck ();
-//		Debug.Log("Black: check: " + bs.isWhiteCheck ());
-
-		//Debug.Log("Black: check: " + GameObject.Find ("Board").GetComponent<board> ().isCheck(1));
+		if (bs.isWhiteCheck ()) {
+			GameObject.Find ("GameManager").GetComponent<gameManager> ().check = true;
+			GameObject.Find ("CheckText").GetComponent<Text> ().text = "King in check.";
+//			Debug.Log("After Black' turn: checkmate: " + GameObject.Find ("Board").GetComponent<board> ().isWhiteCheckmate());
+			if (GameObject.Find ("Board").GetComponent<board> ().isWhiteCheckmate ()) {
+				GameObject.Find ("GameManager").GetComponent<gameManager> ().resetGame ("Black wins\nPress any key to restart.");
+			}
+		}
 	}
 
-	public UnitType getUnitTypeAtPosition(Vector3 pos){
+	public UnitType getUnitTypeAtPosition (Vector3 pos) {
 		if (pawn1.transform.position.Equals (pos))
 			return UnitType.PAWN;
 		else if (pawn2.transform.position.Equals (pos))
@@ -159,7 +140,7 @@ public class Black : MonoBehaviour {
 		return UnitType.NULL;
 	}
 
-	public void removeUnit(Vector3 pos){
+	public void removeUnit (Vector3 pos) {
 		if (pawn1.transform.position.Equals (pos))
 			pawn1.transform.position = trash;
 		else if (pawn2.transform.position.Equals (pos))
@@ -194,7 +175,7 @@ public class Black : MonoBehaviour {
 			king.transform.position = trash;
 	}
 
-	public Vector3 getKingLocation(){
+	public Vector3 getKingLocation () {
 		return king.transform.position;
 	}
 

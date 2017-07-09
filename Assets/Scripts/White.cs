@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class White : MonoBehaviour {
 
@@ -35,30 +36,6 @@ public class White : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-
-
-		// get tile location and move
-		/*Vector3 pos = GameObject.Find ("Board").GetComponent<board> ().getTilePos (0, 2);
-
-		if(Input.GetMouseButtonDown(0)){ // TODO: Add coroutine for movement...
-			float timePassed = 0;
-			while (timePassed < 1.0f) {
-				// Increment the time to prevent an infinite loop
-				timePassed += Time.deltaTime; 
-				// Slowly adjust the position and rotation so it approaches the spawn position and rotation
-				//transform.position += deltaPos * Time.deltaTime;
-				pawn1.GetComponent<Transform>().position = Vector3.MoveTowards(pawn1.GetComponent<Transform>().position, pos, Time.deltaTime);
-			}
-
-			Debug.Log (pos);
-
-
-			//float step = speed * Time.deltaTime;
-			//pawn1.GetComponent<Transform>().Translate(new Vector3(pos.x, pawn1.GetComponent<Transform>().position.y, pos.y));
-			Debug.Log (pawn1.GetComponent<Transform>().position.x + " " + pawn1.GetComponent<Transform>().position.z);
-		
-		}
-		*/
 	}
 
 	public void moveObjectAtLocationTo(Vector3 pos, Vector3 pos2){
@@ -115,10 +92,15 @@ public class White : MonoBehaviour {
 		}
 
 		BoardStructure bs = new BoardStructure ();
-		bs.isBlackCheck ();
-		//		Debug.Log("White: check: " + bs.isBlackCheck ());
+		if (bs.isBlackCheck ()) {
+			GameObject.Find ("GameManager").GetComponent<gameManager> ().check = true;
+			GameObject.Find ("CheckText").GetComponent<Text> ().text = "King in check.";
+//			Debug.Log("After White' turn: checkmate: " + GameObject.Find ("Board").GetComponent<board> ().isBlackCheckmate());
+			if(GameObject.Find ("Board").GetComponent<board> ().isBlackCheckmate()){
+				GameObject.Find ("GameManager").GetComponent<gameManager> ().resetGame("White wins\nPress any key to restart.");
+			}
+		}
 
-//		Debug.Log("White: check: " + GameObject.Find ("Board").GetComponent<board> ().isCheck(0+0));
 
 	}
 
