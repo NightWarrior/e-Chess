@@ -48,101 +48,12 @@ public class BoardStructure {
 		}
 	}
 
-	public bool checkMovable (Vector3 from, Vector3 to) {
-		bool moveable = true;
-		UnitTeam team = board [(int)from.x, (int)from.z].team; // team of the unit to be moved
-
-		//updateBoard ();
-		move (from, to);
-		if (team == UnitTeam.BLACK) {// team of unit we are checking for movement is checked
-			moveable = isBlackCheck ();
-		} else
-			moveable = isWhiteCheck ();
-		move (to, from);
-
-		return !moveable;
-
-		//		return false;
-	}
-
-	public void move (Vector3 from, Vector3 to) {
-		if (board [(int)from.x, (int)from.z].piece == UnitType.KING) {
-			if (board [(int)from.x, (int)from.z].team == UnitTeam.BLACK) {
-				blackKing.x = to.x;
-				blackKing.y = to.z;
-			} else {
-				whiteKing.x = to.x;
-				whiteKing.y = to.z;
-			}
-		}
-
-		board [(int)to.x, (int)to.z].piece = board [(int)from.x, (int)from.z].piece;
-		board [(int)to.x, (int)to.z].team = board [(int)from.x, (int)from.z].team;
-		board [(int)from.x, (int)from.z].piece = UnitType.NULL;
-		board [(int)from.x, (int)from.z].team = UnitTeam.NULL;
-
-	}
-
-
-	public void updateBoard () {
-
-		// initialize all the pseudo-tiles by what is at the original board at the given time
-		for (int i = 0; i < 8; i++) {
-			for (int j = 0; j < 8; j++) {
-				board [i, j].team = UnitTeam.NULL;
-				board [i, j].piece = UnitType.NULL;
-
-				board [i, j].piece = GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (new Vector3 (i, 0, j)); // first check if a white piece at the place
-				if (board [i, j].piece != UnitType.NULL) {
-					board [i, j].team = UnitTeam.WHITE;
-					if (board [i, j].piece == UnitType.KING)
-						whiteKing = new Vector2 (i, j);
-				} else { // if no white then it initializes to NULL
-					// check if a black is at this location, else NUll is initialized
-					board [i, j].piece = GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (new Vector3 (i, 0, j)); 
-					if (board [i, j].piece != UnitType.NULL) {
-						board [i, j].team = UnitTeam.BLACK;
-						if (board [i, j].piece == UnitType.KING)
-							blackKing = new Vector2 (i, j);
-					} else
-						board [i, j].team = UnitTeam.NULL;
-				}
-			}
-		}
-	}
-
 	public bool isWhiteCheck () {
 		bool[] lineChecks = new bool[4];
 
-		// check king's
-		if ((int)whiteKing.x + 1 < 8)
-		if (board [(int)whiteKing.x + 1, (int)whiteKing.y].team == UnitTeam.BLACK && board [(int)whiteKing.x + 1, (int)whiteKing.y].piece == UnitType.KING)
-			return true;
-		if ((int)whiteKing.y + 1 < 8)
-		if (board [(int)whiteKing.x, (int)whiteKing.y + 1].team == UnitTeam.BLACK && board [(int)whiteKing.x, (int)whiteKing.y + 1].piece == UnitType.KING)
-			return true;
-		if ((int)whiteKing.x - 1 > 0)
-		if (board [(int)whiteKing.x - 1, (int)whiteKing.y].team == UnitTeam.BLACK && board [(int)whiteKing.x - 1, (int)whiteKing.y].piece == UnitType.KING)
-			return true;
-		if ((int)whiteKing.y - 1 > 0)
-		if (board [(int)whiteKing.x, (int)whiteKing.y - 1].team == UnitTeam.BLACK && board [(int)whiteKing.x, (int)whiteKing.y - 1].piece == UnitType.KING)
-			return true;
-		if ((int)whiteKing.x + 1 < 8 && (int)whiteKing.y + 1 < 8)
-		if (board [(int)whiteKing.x + 1, (int)whiteKing.y + 1].team == UnitTeam.BLACK && board [(int)whiteKing.x + 1, (int)whiteKing.y + 1].piece == UnitType.KING)
-			return true;
-		if ((int)whiteKing.x + 1 < 8 && (int)whiteKing.y - 1 > 0)
-		if (board [(int)whiteKing.x + 1, (int)whiteKing.y - 1].team == UnitTeam.BLACK && board [(int)whiteKing.x + 1, (int)whiteKing.y - 1].piece == UnitType.KING)
-			return true;
-		if ((int)whiteKing.x - 1 > 0 && (int)whiteKing.y + 1 < 8)
-		if (board [(int)whiteKing.x - 1, (int)whiteKing.y + 1].team == UnitTeam.BLACK && board [(int)whiteKing.x - 1, (int)whiteKing.y + 1].piece == UnitType.KING)
-			return true;
-		if ((int)whiteKing.x - 1 > 0 && (int)whiteKing.y - 1 > 0)
-		if (board [(int)whiteKing.x - 1, (int)whiteKing.y - 1].team == UnitTeam.BLACK && board [(int)whiteKing.x - 1, (int)whiteKing.y - 1].piece == UnitType.KING)
-			return true;
-
 		// check knight's 
-		if ((int)whiteKing.x + 1 < 8 && (int)whiteKing.y + 2 < 8)
-		if (board [(int)whiteKing.x + 1, (int)whiteKing.y + 2].team == UnitTeam.BLACK && board [(int)whiteKing.x + 1, (int)whiteKing.y + 2].piece == UnitType.KNIGHT)
+		if ((int)(int)whiteKing.x + 1 < 8 && (int)whiteKing.y + 2 < 8)
+		if (board [(int)(int)whiteKing.x + 1, (int)whiteKing.y + 2].team == UnitTeam.BLACK && board [(int)whiteKing.x + 1, (int)whiteKing.y + 2].piece == UnitType.KNIGHT)
 			return true;
 		if ((int)whiteKing.x + 1 < 8 && (int)whiteKing.y - 2 > 0)
 		if (board [(int)whiteKing.x + 1, (int)whiteKing.y - 2].team == UnitTeam.BLACK && board [(int)whiteKing.x + 1, (int)whiteKing.y - 2].piece == UnitType.KNIGHT)
@@ -268,36 +179,9 @@ public class BoardStructure {
 	public bool isBlackCheck () {
 		bool[] lineChecks = new bool[4];
 
-		// check king's
-		if ((int)blackKing.x + 1 < 8)
-		if (board [(int)blackKing.x + 1, (int)blackKing.y].team == UnitTeam.WHITE && board [(int)blackKing.x + 1, (int)blackKing.y].piece == UnitType.KING)
-			return true;
-		if ((int)blackKing.y + 1 < 8)
-		if (board [(int)blackKing.x, (int)blackKing.y + 1].team == UnitTeam.WHITE && board [(int)blackKing.x, (int)blackKing.y + 1].piece == UnitType.KING)
-			return true;
-		if ((int)blackKing.x - 1 > 0)
-		if (board [(int)blackKing.x - 1, (int)blackKing.y].team == UnitTeam.WHITE && board [(int)blackKing.x - 1, (int)blackKing.y].piece == UnitType.KING)
-			return true;
-		if ((int)blackKing.y - 1 > 0)
-		if (board [(int)blackKing.x, (int)blackKing.y - 1].team == UnitTeam.WHITE && board [(int)blackKing.x, (int)blackKing.y - 1].piece == UnitType.KING)
-			return true;
-		if ((int)blackKing.x + 1 < 8 && (int)blackKing.y + 1 < 8)
-		if (board [(int)blackKing.x + 1, (int)blackKing.y + 1].team == UnitTeam.WHITE && board [(int)blackKing.x + 1, (int)blackKing.y + 1].piece == UnitType.KING)
-			return true;
-		if ((int)blackKing.x + 1 < 8 && (int)blackKing.y - 1 > 0)
-		if (board [(int)blackKing.x + 1, (int)blackKing.y - 1].team == UnitTeam.WHITE && board [(int)blackKing.x + 1, (int)blackKing.y - 1].piece == UnitType.KING)
-			return true;
-		if ((int)blackKing.x - 1 > 0 && (int)blackKing.y + 1 < 8)
-		if (board [(int)blackKing.x - 1, (int)blackKing.y + 1].team == UnitTeam.WHITE && board [(int)blackKing.x - 1, (int)blackKing.y + 1].piece == UnitType.KING)
-			return true;
-		if ((int)blackKing.x - 1 > 0 && (int)blackKing.y - 1 > 0)
-		if (board [(int)blackKing.x - 1, (int)blackKing.y - 1].team == UnitTeam.WHITE && board [(int)blackKing.x - 1, (int)blackKing.y - 1].piece == UnitType.KING)
-			return true;
-
-
 		// check knight's 
-		if ((int)blackKing.x + 1 < 8 && (int)blackKing.y + 2 < 8)
-		if (board [(int)blackKing.x + 1, (int)blackKing.y + 2].team == UnitTeam.WHITE && board [(int)blackKing.x + 1, (int)blackKing.y + 2].piece == UnitType.KNIGHT)
+		if ((int)(int)blackKing.x + 1 < 8 && (int)blackKing.y + 2 < 8)
+		if (board [(int)(int)blackKing.x + 1, (int)blackKing.y + 2].team == UnitTeam.WHITE && board [(int)blackKing.x + 1, (int)blackKing.y + 2].piece == UnitType.KNIGHT)
 			return true;
 		if ((int)blackKing.x + 1 < 8 && (int)blackKing.y - 2 > 0)
 		if (board [(int)blackKing.x + 1, (int)blackKing.y - 2].team == UnitTeam.WHITE && board [(int)blackKing.x + 1, (int)blackKing.y - 2].piece == UnitType.KNIGHT)
@@ -420,9 +304,67 @@ public class BoardStructure {
 		return false;
 	}
 
+	public bool checkMovable (Vector3 from, Vector3 to) {
+		bool moveable = true;
+		UnitTeam team = board [(int)from.x, (int)from.z].team; // team of the unit to be moved
 
-//	public bool isWhiteCheckMate(){
-//
-//	}
+		updateBoard ();
+		move (from, to);
+		if (team == UnitTeam.BLACK) {// team of unit we are checking for movement is checked
+			moveable = isBlackCheck ();
+		} else
+			moveable = isWhiteCheck ();
+		move (to, from);
 
+		return !moveable;
+
+//		return false;
+	}
+
+	public void move (Vector3 from, Vector3 to) {
+		if (board [(int)to.x, (int)to.z].piece == UnitType.NULL) {
+			if (board [(int)from.x, (int)from.z].piece == UnitType.KING) {
+				if (board [(int)from.x, (int)from.z].team == UnitTeam.BLACK) {
+					blackKing.x = to.x;
+					blackKing.y = to.z;
+				} else {
+					whiteKing.x = to.x;
+					whiteKing.y = to.z;
+				}
+			}
+
+			board [(int)to.x, (int)to.z] = board [(int)from.z, (int)from.z];
+			board [(int)from.x, (int)from.z].piece = UnitType.NULL;
+			board [(int)from.x, (int)from.z].team = UnitTeam.NULL;
+		}
+
+	}
+
+
+	public void updateBoard () {
+
+		// initialize all the pseudo-tiles by what is at the original board at the given time
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				board [i, j].team = UnitTeam.NULL;
+				board [i, j].piece = UnitType.NULL;
+
+				board [i, j].piece = GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (new Vector3 (i, 0, j)); // first check if a white piece at the place
+				if (board [i, j].piece != UnitType.NULL) {
+					board [i, j].team = UnitTeam.WHITE;
+					if (board [i, j].piece == UnitType.KING)
+						whiteKing = new Vector2 (i, j);
+				} else { // if no white then it initializes to NULL
+					// check if a black is at this location, else NUll is initialized
+					board [i, j].piece = GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (new Vector3 (i, 0, j)); 
+					if (board [i, j].piece != UnitType.NULL) {
+						board [i, j].team = UnitTeam.BLACK;
+						if (board [i, j].piece == UnitType.KING)
+							blackKing = new Vector2 (i, j);
+					} else
+						board [i, j].team = UnitTeam.NULL;
+				}
+			}
+		}
+	}
 }
