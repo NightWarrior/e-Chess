@@ -3,12 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public enum UnitType {PAWN, ROOK, KNIGHT, BISHOP, QUEEN, KING, NULL};
+public enum UnitType {
+PAWN,
+	ROOK,
+	KNIGHT,
+	BISHOP,
+	QUEEN,
+	KING,
+	NULL}
+;
 
 public class board : MonoBehaviour {
 
 
-	public GameObject[,] rows=new GameObject[8,8];
+	public GameObject[,] rows = new GameObject[8, 8];
 	private GameObject[] highlights;
 	private int highlightCount;
 	public GameObject highlight;
@@ -24,7 +32,7 @@ public class board : MonoBehaviour {
 		// Grabbing White unit pieces from White class
 		for (int j = 0; j < 8; j++) {
 			for (int i = 0; i < 8; i++) {
-				rows[i,j] = transform.GetChild( count++ ).gameObject;
+				rows [i, j] = transform.GetChild (count++).gameObject;
 			}
 		}
 
@@ -85,14 +93,14 @@ public class board : MonoBehaviour {
 	*/
 
 
-	public Vector3 getTilePos(int x, int z){ 
+	public Vector3 getTilePos (int x, int z) { 
 		Vector3 pos;
-		pos = rows [x,z].GetComponent<Transform> ().position;
+		pos = rows [x, z].GetComponent<Transform> ().position;
 
 		return pos;
 	}
 
-	public Vector3 checkTileHitandGetPos(){ // checks if mouse clicked on the tile
+	public Vector3 checkTileHitandGetPos () { // checks if mouse clicked on the tile
 		Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
 		RaycastHit hitInfo;
 		for (int i = 0; i < 8; i++) {
@@ -106,42 +114,19 @@ public class board : MonoBehaviour {
 
 	}
 
-	public bool checkTileFree(Vector3 pos, Vector3 piecePos){ // check if a highlight tile can be placed at the location for movement
+	public bool checkTileFree (Vector3 pos, Vector3 piecePos) { // check if a highlight tile can be placed at the location for movement
 		if (pos.x < 0 || pos.x > 7 || pos.z < 0 || pos.z > 7)
 			return false;
-		int turnColor = 0;
-		if (GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (pos) == UnitType.NULL  // checking if the area is free
-			&& GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (pos) == UnitType.NULL){
-
-			turnColor = GameObject.Find ("GameManager").GetComponent<gameManager> ().TurnColor;
-			turnColor = (turnColor + 1) % 2;
-
-			if (turnColor == 0) {
-				GameObject.Find ("White").GetComponent<White> ().moveObjectAtLocationTo (pos, piecePos);
-			} else {
-				GameObject.Find ("Black").GetComponent<Black> ().moveObjectAtLocationTo (pos, piecePos);
-			}
-
-			// move unit, check then move back
-			if (isCheck (GameObject.Find ("GameManager").GetComponent<gameManager> ().TurnColor)) {
-
-				if (turnColor == 0) {
-					GameObject.Find ("White").GetComponent<White> ().moveObjectAtLocationTo (piecePos, pos);
-				} else {
-					GameObject.Find ("Black").GetComponent<Black> ().moveObjectAtLocationTo (piecePos, pos);
-				}
-				return true;
-			}
+		if (GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (pos) == UnitType.NULL// checking if the area is free
+		    && GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (pos) == UnitType.NULL) {
+			BoardStructure bs = new BoardStructure ();
+			return bs.checkMovable (piecePos, pos);
 		}
-		if (turnColor == 0) {
-			GameObject.Find ("White").GetComponent<White> ().moveObjectAtLocationTo (piecePos, pos);
-		} else {
-			GameObject.Find ("Black").GetComponent<Black> ().moveObjectAtLocationTo (piecePos, pos);
-		}
+			
 		return false;
 	}
 
-	bool checkTileFree(Vector3 pos){ // check if a highlight tile can be placed at the location for movement
+	bool checkTileFree (Vector3 pos) { // check if a highlight tile can be placed at the location for movement
 		if (pos.x < 0 || pos.x > 7 || pos.z < 0 || pos.z > 7)
 			return false;
 		if (GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (pos) == UnitType.NULL// checking if the area is free
@@ -151,21 +136,21 @@ public class board : MonoBehaviour {
 	}
 
 
-	public bool checkHitableWhiteEnemy(Vector3 pos){
+	public bool checkHitableWhiteEnemy (Vector3 pos) {
 		if (GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (pos) != UnitType.NULL) {
 			return true;
 		}
 		return false;
 	}
 
-	public bool checkHitableBlackEnemy(Vector3 pos){
+	public bool checkHitableBlackEnemy (Vector3 pos) {
 		if (GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (pos) != UnitType.NULL) {
 			return true;
 		}
 		return false;
 	}
 
-	public void highLightMoveLocations(UnitType unitType, Vector3 pos, int face){
+	public void highLightMoveLocations (UnitType unitType, Vector3 pos, int face) {
 		
 
 		if (unitType == UnitType.PAWN) {
@@ -173,17 +158,17 @@ public class board : MonoBehaviour {
 			highlightCount = 0;
 			if (pos.z == 1 && face == 1 || pos.z == 6 && face == -1) {
 				// Check if pawn is at initial stage and can move two steps
-				if (checkTileFree (new Vector3 (pos.x, pos.y, pos.z + 1 * face),pos)) {
+				if (checkTileFree (new Vector3 (pos.x, pos.y, pos.z + 1 * face), pos)) {
 					highlightList.Add (Instantiate (highlight, new Vector3 (pos.x, pos.y, pos.z + 1 * face), Quaternion.identity));
 					highlightCount++;
-					if (checkTileFree (new Vector3 (pos.x, pos.y, pos.z + 2 * face),pos)) {
+					if (checkTileFree (new Vector3 (pos.x, pos.y, pos.z + 2 * face), pos)) {
 						highlightList.Add (Instantiate (highlight, new Vector3 (pos.x, pos.y, pos.z + 2 * face), Quaternion.identity));
 						highlightCount++;
 					}
 				}
 			} else {
 				// Check rest of the times
-				if (checkTileFree (new Vector3 (pos.x, pos.y, pos.z + 1 * face),pos)) {
+				if (checkTileFree (new Vector3 (pos.x, pos.y, pos.z + 1 * face), pos)) {
 					highlightList.Add (Instantiate (highlight, new Vector3 (pos.x, pos.y, pos.z + 1 * face), Quaternion.identity));
 					highlightCount++;
 				}
@@ -218,43 +203,43 @@ public class board : MonoBehaviour {
 
 
 			highlights = new GameObject[highlightList.Count];
-			int c =0;
+			int c = 0;
 			foreach (GameObject g in highlightList) {
-				highlights[c++] = g;
+				highlights [c++] = g;
 			}
 		} else if (unitType == UnitType.KNIGHT) { // Knight movements availability
 			List <GameObject> highlightList = new List<GameObject> ();
 
 			// Check where knight can move
-			if (checkTileFree (new Vector3 (pos.x + 1, pos.y, pos.z + 2 * face),pos)){
+			if (checkTileFree (new Vector3 (pos.x + 1, pos.y, pos.z + 2 * face), pos)) {
 				highlightList.Add (Instantiate (highlight, new Vector3 (pos.x + 1, pos.y, pos.z + 2 * face), Quaternion.identity));
 				highlightCount++;
 			}
-			if (checkTileFree (new Vector3 (pos.x + 2, pos.y, pos.z + 1 * face),pos)){
+			if (checkTileFree (new Vector3 (pos.x + 2, pos.y, pos.z + 1 * face), pos)) {
 				highlightList.Add (Instantiate (highlight, new Vector3 (pos.x + 2, pos.y, pos.z + 1 * face), Quaternion.identity));
 				highlightCount++;
 			}
-			if (checkTileFree (new Vector3 (pos.x + 1, pos.y, pos.z + -2 * face),pos)){
+			if (checkTileFree (new Vector3 (pos.x + 1, pos.y, pos.z + -2 * face), pos)) {
 				highlightList.Add (Instantiate (highlight, new Vector3 (pos.x + 1, pos.y, pos.z + -2 * face), Quaternion.identity));
 				highlightCount++;
 			}
-			if (checkTileFree (new Vector3 (pos.x + 2, pos.y, pos.z + -1 * face),pos)){
+			if (checkTileFree (new Vector3 (pos.x + 2, pos.y, pos.z + -1 * face), pos)) {
 				highlightList.Add (Instantiate (highlight, new Vector3 (pos.x + 2, pos.y, pos.z + -1 * face), Quaternion.identity));
 				highlightCount++;
 			}
-			if (checkTileFree (new Vector3 (pos.x + -1, pos.y, pos.z + -2 * face),pos)){
+			if (checkTileFree (new Vector3 (pos.x + -1, pos.y, pos.z + -2 * face), pos)) {
 				highlightList.Add (Instantiate (highlight, new Vector3 (pos.x + -1, pos.y, pos.z + -2 * face), Quaternion.identity));
 				highlightCount++;
 			}
-			if (checkTileFree (new Vector3 (pos.x + -2, pos.y, pos.z + -1 * face),pos)){
+			if (checkTileFree (new Vector3 (pos.x + -2, pos.y, pos.z + -1 * face), pos)) {
 				highlightList.Add (Instantiate (highlight, new Vector3 (pos.x + -2, pos.y, pos.z + -1 * face), Quaternion.identity));
 				highlightCount++;
 			}
-			if (checkTileFree (new Vector3 (pos.x + -1, pos.y, pos.z + 2 * face),pos)){
+			if (checkTileFree (new Vector3 (pos.x + -1, pos.y, pos.z + 2 * face), pos)) {
 				highlightList.Add (Instantiate (highlight, new Vector3 (pos.x + -1, pos.y, pos.z + 2 * face), Quaternion.identity));
 				highlightCount++;
 			}
-			if (checkTileFree (new Vector3 (pos.x + -2, pos.y, pos.z + 1 * face),pos)){
+			if (checkTileFree (new Vector3 (pos.x + -2, pos.y, pos.z + 1 * face), pos)) {
 				highlightList.Add (Instantiate (highlight, new Vector3 (pos.x + -2, pos.y, pos.z + 1 * face), Quaternion.identity));
 				highlightCount++;
 			}
@@ -293,8 +278,7 @@ public class board : MonoBehaviour {
 					highlightList.Add (Instantiate (highlight, new Vector3 (pos.x + -2, pos.y, pos.z + 1 * face), Quaternion.identity));
 					highlightCount++;
 				}
-			}
-			else{
+			} else {
 				// Check what knight can capture
 				if (checkHitableWhiteEnemy (new Vector3 (pos.x + 1, pos.y, pos.z + 2 * face))) {
 					highlightList.Add (Instantiate (highlight, new Vector3 (pos.x + 1, pos.y, pos.z + 2 * face), Quaternion.identity));
@@ -331,9 +315,9 @@ public class board : MonoBehaviour {
 			}
 
 			highlights = new GameObject[highlightList.Count];
-			int c =0;
+			int c = 0;
 			foreach (GameObject g in highlightList) {
-				highlights[c++] = g;
+				highlights [c++] = g;
 			}
 		} else if (unitType == UnitType.ROOK) {
 			List <GameObject> highlightList = new List<GameObject> ();
@@ -343,7 +327,7 @@ public class board : MonoBehaviour {
 				if (breaker == true) {
 					break;
 				}
-				if (checkTileFree (new Vector3 (pos.x + 1 + i, pos.y, pos.z),pos)) {
+				if (checkTileFree (new Vector3 (pos.x + 1 + i, pos.y, pos.z), pos)) {
 					highlightList.Add (Instantiate (highlight, new Vector3 (pos.x + 1 + i, pos.y, pos.z), Quaternion.identity));
 					highlightCount++;
 				} else if (face == 1) { 
@@ -367,7 +351,7 @@ public class board : MonoBehaviour {
 				if (breaker == true) {
 					break;
 				}
-				if (checkTileFree (new Vector3 (pos.x - 1 - i, pos.y, pos.z),pos)) {
+				if (checkTileFree (new Vector3 (pos.x - 1 - i, pos.y, pos.z), pos)) {
 					highlightList.Add (Instantiate (highlight, new Vector3 (pos.x - 1 - i, pos.y, pos.z), Quaternion.identity));
 					highlightCount++;
 				} else if (face == 1) { 
@@ -376,7 +360,7 @@ public class board : MonoBehaviour {
 						highlightList.Add (Instantiate (highlight, new Vector3 (pos.x - 1 - i, pos.y, pos.z), Quaternion.identity));
 						highlightCount++;
 						break;
-				}
+					}
 				} else if (face == -1) {
 					breaker = true;
 					if (checkHitableWhiteEnemy (new Vector3 (pos.x - 1 - i, pos.y, pos.z))) {
@@ -392,24 +376,24 @@ public class board : MonoBehaviour {
 				if (breaker == true) {
 					break;
 				}
-				if (checkTileFree (new Vector3 (pos.x, pos.y, pos.z + 1 * face + i * face),pos)) {
-					highlightList.Add (Instantiate (highlight, new Vector3 (pos.x , pos.y, pos.z + 1 * face + i * face), Quaternion.identity));
+				if (checkTileFree (new Vector3 (pos.x, pos.y, pos.z + 1 * face + i * face), pos)) {
+					highlightList.Add (Instantiate (highlight, new Vector3 (pos.x, pos.y, pos.z + 1 * face + i * face), Quaternion.identity));
 					highlightCount++;
 				} else if (face == 1) { 
 					breaker = true;
 					if (checkHitableBlackEnemy (new Vector3 (pos.x, pos.y, pos.z + 1 * face + i * face))) {
-						highlightList.Add (Instantiate (highlight, new Vector3 (pos.x , pos.y, pos.z + 1 * face + i * face), Quaternion.identity));
+						highlightList.Add (Instantiate (highlight, new Vector3 (pos.x, pos.y, pos.z + 1 * face + i * face), Quaternion.identity));
 						highlightCount++;
 						break;
 					}
 				} else if (face == -1) {
 					breaker = true;
 					if (checkHitableWhiteEnemy (new Vector3 (pos.x, pos.y, pos.z + 1 * face + i * face))) {
-						highlightList.Add (Instantiate (highlight, new Vector3 (pos.x , pos.y, pos.z + 1 * face + i * face), Quaternion.identity));
+						highlightList.Add (Instantiate (highlight, new Vector3 (pos.x, pos.y, pos.z + 1 * face + i * face), Quaternion.identity));
 						highlightCount++;
 						break;
 					}
-				} else 
+				} else
 					break;
 			}
 			breaker = false;
@@ -417,33 +401,33 @@ public class board : MonoBehaviour {
 				if (breaker == true) {
 					break;
 				}
-				if (checkTileFree (new Vector3 (pos.x, pos.y, pos.z - 1 * face - i * face),pos)) {
-					highlightList.Add (Instantiate (highlight, new Vector3 (pos.x , pos.y, pos.z - 1 * face - i * face), Quaternion.identity));
+				if (checkTileFree (new Vector3 (pos.x, pos.y, pos.z - 1 * face - i * face), pos)) {
+					highlightList.Add (Instantiate (highlight, new Vector3 (pos.x, pos.y, pos.z - 1 * face - i * face), Quaternion.identity));
 					highlightCount++;
 				} else if (face == 1) { 
 					breaker = true;
 					if (checkHitableBlackEnemy (new Vector3 (pos.x, pos.y, pos.z - 1 * face - i * face))) {
-						highlightList.Add (Instantiate (highlight, new Vector3 (pos.x , pos.y, pos.z - 1 * face - i * face), Quaternion.identity));
+						highlightList.Add (Instantiate (highlight, new Vector3 (pos.x, pos.y, pos.z - 1 * face - i * face), Quaternion.identity));
 						highlightCount++;
 						break;
 					}
 				} else if (face == -1) {
 					breaker = true;
 					if (checkHitableWhiteEnemy (new Vector3 (pos.x, pos.y, pos.z - 1 * face - i * face))) {
-						highlightList.Add (Instantiate (highlight, new Vector3 (pos.x , pos.y, pos.z - 1 * face - i * face), Quaternion.identity));
+						highlightList.Add (Instantiate (highlight, new Vector3 (pos.x, pos.y, pos.z - 1 * face - i * face), Quaternion.identity));
 						highlightCount++;
 						break;
 					}
-				} else 
+				} else
 					break;
 			}
 			highlights = new GameObject[highlightList.Count];
-			int c =0;
+			int c = 0;
 			foreach (GameObject g in highlightList) {
-				highlights[c++] = g;
+				highlights [c++] = g;
 			}
 
-		}else if (unitType == UnitType.BISHOP) {
+		} else if (unitType == UnitType.BISHOP) {
 			List <GameObject> highlightList = new List<GameObject> ();
 			bool breaker = false;
 
@@ -452,24 +436,24 @@ public class board : MonoBehaviour {
 				if (breaker == true) {
 					break;
 				}	
-				if (checkTileFree (new Vector3 (pos.x + 1 + i, pos.y, pos.z +1 * face + i * face),pos)) {
-					highlightList.Add (Instantiate (highlight, new Vector3 (pos.x + 1 + i, pos.y, pos.z +1 * face + i * face), Quaternion.identity));
+				if (checkTileFree (new Vector3 (pos.x + 1 + i, pos.y, pos.z + 1 * face + i * face), pos)) {
+					highlightList.Add (Instantiate (highlight, new Vector3 (pos.x + 1 + i, pos.y, pos.z + 1 * face + i * face), Quaternion.identity));
 					highlightCount++;
 				} else if (face == 1) { 
 					breaker = true;
-					if (checkHitableBlackEnemy (new Vector3 (pos.x + 1 + i, pos.y, pos.z +1 * face + i * face))) {
-						highlightList.Add (Instantiate (highlight, new Vector3 (pos.x + 1 + i, pos.y, pos.z +1 * face + i * face), Quaternion.identity));
+					if (checkHitableBlackEnemy (new Vector3 (pos.x + 1 + i, pos.y, pos.z + 1 * face + i * face))) {
+						highlightList.Add (Instantiate (highlight, new Vector3 (pos.x + 1 + i, pos.y, pos.z + 1 * face + i * face), Quaternion.identity));
 						highlightCount++;
 						break;
 					}
 				} else if (face == -1) {
 					breaker = true;
-					if (checkHitableWhiteEnemy (new Vector3 (pos.x + 1 + i, pos.y, pos.z +1 * face + i * face))) {
-						highlightList.Add (Instantiate (highlight, new Vector3 (pos.x + 1 + i, pos.y, pos.z +1 * face + i * face), Quaternion.identity));
+					if (checkHitableWhiteEnemy (new Vector3 (pos.x + 1 + i, pos.y, pos.z + 1 * face + i * face))) {
+						highlightList.Add (Instantiate (highlight, new Vector3 (pos.x + 1 + i, pos.y, pos.z + 1 * face + i * face), Quaternion.identity));
 						highlightCount++;
 						break;
 					}
-				} else 
+				} else
 					break;
 			}
 			breaker = false;
@@ -477,7 +461,7 @@ public class board : MonoBehaviour {
 				if (breaker == true) {
 					break;
 				}
-				if (checkTileFree (new Vector3 (pos.x - 1 - i, pos.y, pos.z - 1 * face - i * face),pos)) {
+				if (checkTileFree (new Vector3 (pos.x - 1 - i, pos.y, pos.z - 1 * face - i * face), pos)) {
 					highlightList.Add (Instantiate (highlight, new Vector3 (pos.x - 1 - i, pos.y, pos.z - 1 * face - i * face), Quaternion.identity));
 					highlightCount++;
 				} else if (face == 1) { 
@@ -501,24 +485,24 @@ public class board : MonoBehaviour {
 				if (breaker == true) {
 					break;
 				}
-				if (checkTileFree (new Vector3 (pos.x - 1 - i, pos.y, pos.z + 1 * face + i * face),pos)) {
-					highlightList.Add (Instantiate (highlight, new Vector3 (pos.x - 1 - i , pos.y, pos.z + 1 * face + i * face), Quaternion.identity));
+				if (checkTileFree (new Vector3 (pos.x - 1 - i, pos.y, pos.z + 1 * face + i * face), pos)) {
+					highlightList.Add (Instantiate (highlight, new Vector3 (pos.x - 1 - i, pos.y, pos.z + 1 * face + i * face), Quaternion.identity));
 					highlightCount++;
 				} else if (face == 1) { 
 					breaker = true;
 					if (checkHitableBlackEnemy (new Vector3 (pos.x - 1 - i, pos.y, pos.z + 1 * face + i * face))) {
-						highlightList.Add (Instantiate (highlight, new Vector3 (pos.x - 1 - i , pos.y, pos.z + 1 * face + i * face), Quaternion.identity));
+						highlightList.Add (Instantiate (highlight, new Vector3 (pos.x - 1 - i, pos.y, pos.z + 1 * face + i * face), Quaternion.identity));
 						highlightCount++;
 						break;
 					}
 				} else if (face == -1) {
 					breaker = true;
 					if (checkHitableWhiteEnemy (new Vector3 (pos.x - 1 - i, pos.y, pos.z + 1 * face + i * face))) {
-						highlightList.Add (Instantiate (highlight, new Vector3 (pos.x - 1 - i , pos.y, pos.z + 1 * face + i * face), Quaternion.identity));
+						highlightList.Add (Instantiate (highlight, new Vector3 (pos.x - 1 - i, pos.y, pos.z + 1 * face + i * face), Quaternion.identity));
 						highlightCount++;
 						break;
 					} 
-				} else 
+				} else
 					break;
 			}
 			breaker = false;
@@ -526,7 +510,7 @@ public class board : MonoBehaviour {
 				if (breaker == true) {
 					break;
 				}
-				if (checkTileFree (new Vector3 (pos.x + 1 + i, pos.y, pos.z - 1 * face - i * face),pos)) {
+				if (checkTileFree (new Vector3 (pos.x + 1 + i, pos.y, pos.z - 1 * face - i * face), pos)) {
 					highlightList.Add (Instantiate (highlight, new Vector3 (pos.x + 1 + i, pos.y, pos.z - 1 * face - i * face), Quaternion.identity));
 					highlightCount++;
 				} else if (face == 1) { 
@@ -543,16 +527,16 @@ public class board : MonoBehaviour {
 						highlightCount++;
 						break;
 					}
-				} else 
+				} else
 					break;
 			}
 			highlights = new GameObject[highlightList.Count];
-			int c =0;
+			int c = 0;
 			foreach (GameObject g in highlightList) {
-				highlights[c++] = g;
+				highlights [c++] = g;
 			}
 
-		}else if (unitType == UnitType.QUEEN) {
+		} else if (unitType == UnitType.QUEEN) {
 			List <GameObject> highlightList = new List<GameObject> ();
 			bool breaker = false;
 			highlightCount = 0;
@@ -560,7 +544,7 @@ public class board : MonoBehaviour {
 				if (breaker == true) {
 					break;
 				}
-				if (checkTileFree (new Vector3 (pos.x + 1 + i, pos.y, pos.z),pos)) {
+				if (checkTileFree (new Vector3 (pos.x + 1 + i, pos.y, pos.z), pos)) {
 					highlightList.Add (Instantiate (highlight, new Vector3 (pos.x + 1 + i, pos.y, pos.z), Quaternion.identity));
 					highlightCount++;
 				} else if (face == 1) { 
@@ -577,7 +561,7 @@ public class board : MonoBehaviour {
 						highlightCount++;
 						break;
 					}
-				} else 
+				} else
 					break;
 			}
 			breaker = false;
@@ -585,7 +569,7 @@ public class board : MonoBehaviour {
 				if (breaker == true) {
 					break;
 				}
-				if (checkTileFree (new Vector3 (pos.x - 1 - i, pos.y, pos.z),pos)) {
+				if (checkTileFree (new Vector3 (pos.x - 1 - i, pos.y, pos.z), pos)) {
 					highlightList.Add (Instantiate (highlight, new Vector3 (pos.x - 1 - i, pos.y, pos.z), Quaternion.identity));
 					highlightCount++;
 				} else if (face == 1) { 
@@ -602,7 +586,7 @@ public class board : MonoBehaviour {
 						highlightCount++;
 						break;
 					}
-				} else 
+				} else
 					break;
 			}
 			breaker = false;
@@ -610,24 +594,24 @@ public class board : MonoBehaviour {
 				if (breaker == true) {
 					break;
 				}
-				if (checkTileFree (new Vector3 (pos.x, pos.y, pos.z + 1 * face + i * face),pos)) {
-					highlightList.Add (Instantiate (highlight, new Vector3 (pos.x , pos.y, pos.z + 1 * face + i * face), Quaternion.identity));
+				if (checkTileFree (new Vector3 (pos.x, pos.y, pos.z + 1 * face + i * face), pos)) {
+					highlightList.Add (Instantiate (highlight, new Vector3 (pos.x, pos.y, pos.z + 1 * face + i * face), Quaternion.identity));
 					highlightCount++;
 				} else if (face == 1) { 
 					breaker = true;
-					if (checkHitableBlackEnemy (new Vector3 (pos.x , pos.y, pos.z + 1 * face + i * face))) {
-						highlightList.Add (Instantiate (highlight, new Vector3 (pos.x , pos.y, pos.z + 1 * face + i * face), Quaternion.identity));
+					if (checkHitableBlackEnemy (new Vector3 (pos.x, pos.y, pos.z + 1 * face + i * face))) {
+						highlightList.Add (Instantiate (highlight, new Vector3 (pos.x, pos.y, pos.z + 1 * face + i * face), Quaternion.identity));
 						highlightCount++;
 						break;
 					}
 				} else if (face == -1) {
 					breaker = true;
-					if (checkHitableWhiteEnemy (new Vector3 (pos.x , pos.y, pos.z + 1 * face + i * face))) {
-						highlightList.Add (Instantiate (highlight, new Vector3 (pos.x , pos.y, pos.z + 1 * face + i * face), Quaternion.identity));
+					if (checkHitableWhiteEnemy (new Vector3 (pos.x, pos.y, pos.z + 1 * face + i * face))) {
+						highlightList.Add (Instantiate (highlight, new Vector3 (pos.x, pos.y, pos.z + 1 * face + i * face), Quaternion.identity));
 						highlightCount++;
 						break;
 					}
-				} else 
+				} else
 					break;
 			}
 			breaker = false;
@@ -635,24 +619,24 @@ public class board : MonoBehaviour {
 				if (breaker == true) {
 					break;
 				}
-				if (checkTileFree (new Vector3 (pos.x, pos.y, pos.z - 1 * face - i * face),pos)) {
-					highlightList.Add (Instantiate (highlight, new Vector3 (pos.x , pos.y, pos.z - 1 * face - i * face), Quaternion.identity));
+				if (checkTileFree (new Vector3 (pos.x, pos.y, pos.z - 1 * face - i * face), pos)) {
+					highlightList.Add (Instantiate (highlight, new Vector3 (pos.x, pos.y, pos.z - 1 * face - i * face), Quaternion.identity));
 					highlightCount++;
 				} else if (face == 1) { 
 					breaker = true;
 					if (checkHitableBlackEnemy (new Vector3 (pos.x, pos.y, pos.z - 1 * face - i * face))) {
-						highlightList.Add (Instantiate (highlight, new Vector3 (pos.x , pos.y, pos.z - 1 * face - i * face), Quaternion.identity));
+						highlightList.Add (Instantiate (highlight, new Vector3 (pos.x, pos.y, pos.z - 1 * face - i * face), Quaternion.identity));
 						highlightCount++;
 						break;
 					}
 				} else if (face == -1) {
 					breaker = true;
 					if (checkHitableWhiteEnemy (new Vector3 (pos.x, pos.y, pos.z - 1 * face - i * face))) {
-						highlightList.Add (Instantiate (highlight, new Vector3 (pos.x , pos.y, pos.z - 1 * face - i * face), Quaternion.identity));
+						highlightList.Add (Instantiate (highlight, new Vector3 (pos.x, pos.y, pos.z - 1 * face - i * face), Quaternion.identity));
 						highlightCount++;
 						break;
 					}
-				} else 
+				} else
 					break;
 			}
 			breaker = false;
@@ -660,24 +644,24 @@ public class board : MonoBehaviour {
 				if (breaker == true) {
 					break;
 				}
-				if (checkTileFree (new Vector3 (pos.x + 1 + i, pos.y, pos.z +1 * face + i * face),pos)) {
-					highlightList.Add (Instantiate (highlight, new Vector3 (pos.x + 1 + i, pos.y, pos.z +1 * face + i * face), Quaternion.identity));
+				if (checkTileFree (new Vector3 (pos.x + 1 + i, pos.y, pos.z + 1 * face + i * face), pos)) {
+					highlightList.Add (Instantiate (highlight, new Vector3 (pos.x + 1 + i, pos.y, pos.z + 1 * face + i * face), Quaternion.identity));
 					highlightCount++;
 				} else if (face == 1) { 
 					breaker = true;
-					if (checkHitableBlackEnemy (new Vector3 (pos.x + 1 + i, pos.y, pos.z +1 * face + i * face))) {
-						highlightList.Add (Instantiate (highlight, new Vector3 (pos.x + 1 + i, pos.y, pos.z +1 * face + i * face), Quaternion.identity));
+					if (checkHitableBlackEnemy (new Vector3 (pos.x + 1 + i, pos.y, pos.z + 1 * face + i * face))) {
+						highlightList.Add (Instantiate (highlight, new Vector3 (pos.x + 1 + i, pos.y, pos.z + 1 * face + i * face), Quaternion.identity));
 						highlightCount++;
 						break;
 					}
 				} else if (face == -1) {
 					breaker = true;
-					if (checkHitableWhiteEnemy (new Vector3 (pos.x + 1 + i, pos.y, pos.z +1 * face + i * face))) {
-						highlightList.Add (Instantiate (highlight, new Vector3 (pos.x + 1 + i, pos.y, pos.z +1 * face + i * face), Quaternion.identity));
+					if (checkHitableWhiteEnemy (new Vector3 (pos.x + 1 + i, pos.y, pos.z + 1 * face + i * face))) {
+						highlightList.Add (Instantiate (highlight, new Vector3 (pos.x + 1 + i, pos.y, pos.z + 1 * face + i * face), Quaternion.identity));
 						highlightCount++;
 						break;
 					}
-				} else 
+				} else
 					break;
 			}
 			breaker = false;
@@ -685,7 +669,7 @@ public class board : MonoBehaviour {
 				if (breaker == true) {
 					break;
 				}
-				if (checkTileFree (new Vector3 (pos.x - 1 - i, pos.y, pos.z - 1 * face - i * face),pos)) {
+				if (checkTileFree (new Vector3 (pos.x - 1 - i, pos.y, pos.z - 1 * face - i * face), pos)) {
 					highlightList.Add (Instantiate (highlight, new Vector3 (pos.x - 1 - i, pos.y, pos.z - 1 * face - i * face), Quaternion.identity));
 					highlightCount++;
 				} else if (face == 1) { 
@@ -702,7 +686,7 @@ public class board : MonoBehaviour {
 						highlightCount++;
 						break;
 					}
-				} else 
+				} else
 					break;
 			}
 			breaker = false;
@@ -710,24 +694,24 @@ public class board : MonoBehaviour {
 				if (breaker == true) {
 					break;
 				}
-				if (checkTileFree (new Vector3 (pos.x - 1 - i, pos.y, pos.z + 1 * face + i * face),pos)) {
-					highlightList.Add (Instantiate (highlight, new Vector3 (pos.x - 1 - i , pos.y, pos.z + 1 * face + i * face), Quaternion.identity));
+				if (checkTileFree (new Vector3 (pos.x - 1 - i, pos.y, pos.z + 1 * face + i * face), pos)) {
+					highlightList.Add (Instantiate (highlight, new Vector3 (pos.x - 1 - i, pos.y, pos.z + 1 * face + i * face), Quaternion.identity));
 					highlightCount++;
 				} else if (face == 1) { 
 					breaker = true;
 					if (checkHitableBlackEnemy (new Vector3 (pos.x - 1 - i, pos.y, pos.z + 1 * face + i * face))) {
-						highlightList.Add (Instantiate (highlight, new Vector3 (pos.x - 1 - i , pos.y, pos.z + 1 * face + i * face), Quaternion.identity));
+						highlightList.Add (Instantiate (highlight, new Vector3 (pos.x - 1 - i, pos.y, pos.z + 1 * face + i * face), Quaternion.identity));
 						highlightCount++;
 						break;
 					}
 				} else if (face == -1) {
 					breaker = true;
 					if (checkHitableWhiteEnemy (new Vector3 (pos.x - 1 - i, pos.y, pos.z + 1 * face + i * face))) {
-						highlightList.Add (Instantiate (highlight, new Vector3 (pos.x - 1 - i , pos.y, pos.z + 1 * face + i * face), Quaternion.identity));
+						highlightList.Add (Instantiate (highlight, new Vector3 (pos.x - 1 - i, pos.y, pos.z + 1 * face + i * face), Quaternion.identity));
 						highlightCount++;
 						break;
 					}
-				} else 
+				} else
 					break;
 			}
 			breaker = false;
@@ -735,7 +719,7 @@ public class board : MonoBehaviour {
 				if (breaker == true) {
 					break;
 				}
-				if (checkTileFree (new Vector3 (pos.x + 1 + i, pos.y, pos.z - 1 * face - i * face),pos)) {
+				if (checkTileFree (new Vector3 (pos.x + 1 + i, pos.y, pos.z - 1 * face - i * face), pos)) {
 					highlightList.Add (Instantiate (highlight, new Vector3 (pos.x + 1 + i, pos.y, pos.z - 1 * face - i * face), Quaternion.identity));
 					highlightCount++;
 				} else if (face == 1) { 
@@ -752,49 +736,49 @@ public class board : MonoBehaviour {
 						highlightCount++;
 						break;
 					}
-				} else 
+				} else
 					break;
 			}
 			highlights = new GameObject[highlightList.Count];
-			int c =0;
+			int c = 0;
 			foreach (GameObject g in highlightList) {
-				highlights[c++] = g;
+				highlights [c++] = g;
 			}
 
-		} else if(unitType == UnitType.KING){
+		} else if (unitType == UnitType.KING) {
 			List <GameObject> highlightList = new List<GameObject> ();
 			highlightCount = 0;
 
 			// Check Movement 
-			if (checkTileFree (new Vector3 (pos.x + 1, pos.y, pos.z + 1 * face),pos)) {
+			if (checkTileFree (new Vector3 (pos.x + 1, pos.y, pos.z + 1 * face), pos)) {
 				highlightList.Add (Instantiate (highlight, new Vector3 (pos.x + 1, pos.y, pos.z + 1 * face), Quaternion.identity));
 				highlightCount++;
 			}
-			if (checkTileFree (new Vector3 (pos.x + 1, pos.y, pos.z),pos)) {
+			if (checkTileFree (new Vector3 (pos.x + 1, pos.y, pos.z), pos)) {
 				highlightList.Add (Instantiate (highlight, new Vector3 (pos.x + 1, pos.y, pos.z), Quaternion.identity));
 				highlightCount++;
 			}
-			if (checkTileFree (new Vector3 (pos.x + 1, pos.y, pos.z - 1 * face),pos)) {
+			if (checkTileFree (new Vector3 (pos.x + 1, pos.y, pos.z - 1 * face), pos)) {
 				highlightList.Add (Instantiate (highlight, new Vector3 (pos.x + 1, pos.y, pos.z - 1 * face), Quaternion.identity));
 				highlightCount++;
 			}
-			if (checkTileFree (new Vector3 (pos.x , pos.y, pos.z - 1 * face),pos)) {
+			if (checkTileFree (new Vector3 (pos.x, pos.y, pos.z - 1 * face), pos)) {
 				highlightList.Add (Instantiate (highlight, new Vector3 (pos.x, pos.y, pos.z - 1 * face), Quaternion.identity));
 				highlightCount++;
 			}
-			if (checkTileFree (new Vector3 (pos.x - 1, pos.y, pos.z - 1 * face),pos)) {
+			if (checkTileFree (new Vector3 (pos.x - 1, pos.y, pos.z - 1 * face), pos)) {
 				highlightList.Add (Instantiate (highlight, new Vector3 (pos.x - 1, pos.y, pos.z - 1 * face), Quaternion.identity));
 				highlightCount++;
 			}
-			if (checkTileFree (new Vector3 (pos.x - 1, pos.y, pos.z),pos)) {
+			if (checkTileFree (new Vector3 (pos.x - 1, pos.y, pos.z), pos)) {
 				highlightList.Add (Instantiate (highlight, new Vector3 (pos.x - 1, pos.y, pos.z), Quaternion.identity));
 				highlightCount++;
 			}
-			if (checkTileFree (new Vector3 (pos.x - 1, pos.y, pos.z + 1 * face),pos)) {
+			if (checkTileFree (new Vector3 (pos.x - 1, pos.y, pos.z + 1 * face), pos)) {
 				highlightList.Add (Instantiate (highlight, new Vector3 (pos.x - 1, pos.y, pos.z + 1 * face), Quaternion.identity));
 				highlightCount++;
 			}
-			if (checkTileFree (new Vector3 (pos.x, pos.y, pos.z + 1 * face),pos)) {
+			if (checkTileFree (new Vector3 (pos.x, pos.y, pos.z + 1 * face), pos)) {
 				highlightList.Add (Instantiate (highlight, new Vector3 (pos.x, pos.y, pos.z + 1 * face), Quaternion.identity));
 				highlightCount++;
 			}
@@ -833,7 +817,7 @@ public class board : MonoBehaviour {
 					highlightList.Add (Instantiate (highlight, new Vector3 (pos.x, pos.y, pos.z + 1 * face), Quaternion.identity));
 					highlightCount++;
 				}
-			}else {
+			} else {
 				// Check capture moves
 				if (checkHitableWhiteEnemy (new Vector3 (pos.x + 1, pos.y, pos.z + 1 * face))) {
 					highlightList.Add (Instantiate (highlight, new Vector3 (pos.x + 1, pos.y, pos.z + 1 * face), Quaternion.identity));
@@ -870,15 +854,15 @@ public class board : MonoBehaviour {
 			}
 
 			highlights = new GameObject[highlightList.Count];
-			int c =0;
+			int c = 0;
 			foreach (GameObject g in highlightList) {
-				highlights[c++] = g;
+				highlights [c++] = g;
 			}
 
 		}
 	}
 
-	public void removeHighlights(){
+	public void removeHighlights () {
 		//Destroy (GameObject.FindGameObjectsWithTag ("highlight"));
 
 		if (highlights != null) {
@@ -890,433 +874,433 @@ public class board : MonoBehaviour {
 		//highlights = null;
 	}
 
-	public bool checkHightlighted(Vector3 pos){
+	public bool checkHightlighted (Vector3 pos) {
 		for (int i = 0; i < highlightCount; i++) {
-			if(pos.x == highlights[i].transform.position.x
-				&& pos.y == highlights[i].transform.position.y
-				&& pos.z == highlights[i].transform.position.z)
+			if (pos.x == highlights [i].transform.position.x
+			   && pos.y == highlights [i].transform.position.y
+			   && pos.z == highlights [i].transform.position.z)
 				return true;
 		}
 
 		return false;
 	}
 
-	public bool isCheck(int playerTurn){ // white played turn, check isCheck on black's king
-		Vector3 kingPos;
-		if (playerTurn == 0) { // After White's turn
-			Debug.Log("Black's turn");
-			kingPos = GameObject.Find ("Black").GetComponent<Black> ().getKingLocation();
-			// check line of seight for each type of unit
-			// knight
-			if (!checkTileFree (new Vector3 (kingPos.x + 1, kingPos.y, kingPos.z + 2 ))){
-				if (checkHitableWhiteEnemy (new Vector3 (kingPos.x + 1, kingPos.y, kingPos.z + 2 ))) {
-					if(UnitType.KNIGHT==GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition(new Vector3 (kingPos.x + 1, kingPos.y, kingPos.z + 2 )))
-						return true;
-				}
-			}
-			if (!checkTileFree (new Vector3 (kingPos.x + 2, kingPos.y, kingPos.z + 1 ))){
-				if (checkHitableWhiteEnemy (new Vector3 (kingPos.x + 2, kingPos.y, kingPos.z + 1 ))) {
-					if(UnitType.KNIGHT==GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition(new Vector3 (kingPos.x + 2, kingPos.y, kingPos.z + 1 )))
-						return true;
-				}
-			}
-			if (!checkTileFree (new Vector3 (kingPos.x + 1, kingPos.y, kingPos.z + -2 ))){
-				if (checkHitableWhiteEnemy (new Vector3 (kingPos.x + 1, kingPos.y, kingPos.z - 2 ))) {
-					if(UnitType.KNIGHT==GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition(new Vector3 (kingPos.x + 1, kingPos.y, kingPos.z + -2 )))
-						return true;
-				}
-			}
-			if (!checkTileFree (new Vector3 (kingPos.x + 2, kingPos.y, kingPos.z -1 ))){
-				if (checkHitableWhiteEnemy (new Vector3 (kingPos.x + 2, kingPos.y, kingPos.z - 1 ))) {
-					if (UnitType.KNIGHT.Equals(GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (new Vector3 (kingPos.x + 2, kingPos.y, kingPos.z -1)))) {
-						return true;
-					}
-				}
-			}
-			if (!checkTileFree (new Vector3 (kingPos.x + -1, kingPos.y, kingPos.z + -2 ))){
-				if (checkHitableWhiteEnemy (new Vector3 (kingPos.x - 1, kingPos.y, kingPos.z - 2 ))) {
-					if(UnitType.KNIGHT==GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition(new Vector3 (kingPos.x + -1, kingPos.y, kingPos.z + -2 )))
-						return true;
-				}
-			}
-			if (!checkTileFree (new Vector3 (kingPos.x + -2, kingPos.y, kingPos.z + -1 ))){
-				if (checkHitableWhiteEnemy (new Vector3 (kingPos.x - 2, kingPos.y, kingPos.z - 1 ))) {
-					if(UnitType.KNIGHT==GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition(new Vector3 (kingPos.x + -2, kingPos.y, kingPos.z + -1 )))
-						return true;
-				}
-			}
-			if (!checkTileFree (new Vector3 (kingPos.x + -1, kingPos.y, kingPos.z + 2 ))){
-				if (checkHitableWhiteEnemy (new Vector3 (kingPos.x - 1, kingPos.y, kingPos.z + 2 ))) {
-					if(UnitType.KNIGHT==GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition(new Vector3 (kingPos.x + -1, kingPos.y, kingPos.z + 2 )))
-						return true;
-				}
-			}
-			if (!checkTileFree (new Vector3 (kingPos.x + -2, kingPos.y, kingPos.z + 1 ))){
-				if (checkHitableWhiteEnemy (new Vector3 (kingPos.x - 2, kingPos.y, kingPos.z + 1 ))) {
-					if(UnitType.KNIGHT==GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition(new Vector3 (kingPos.x + -2, kingPos.y, kingPos.z + 1 )))
-						return true;
-				}
-			}
-
-			// bishop (includes queen's some paths and the pawn's attack)
-
-			bool breaker = false;
-			for (int i = 0; i < 8; i++) {		
-				if (breaker == true) {
-					break;
-				} 
-				if (checkTileFree (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z + 1 + i ))) {
-					continue;
-				} else { 
-					breaker = true;
-					if (checkHitableWhiteEnemy (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z + 1 + i ))) {
-						if(UnitType.BISHOP==GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition(new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z + 1 + i )))
-							return true;
-						if(UnitType.QUEEN==GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition(new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z + 1 + i )))
-							return true;
-					}
-				}
-			}
-			breaker = false;
-			for (int i = 0; i < 8; i++) {		
-				if (breaker == true) {
-					break;
-				} 
-				if (checkTileFree (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z - 1 - i ))) {
-					continue;
-				} else { 
-					breaker = true;
-					if (checkHitableWhiteEnemy (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z - 1 - i ))) {
-						if(UnitType.BISHOP==GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition(new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z - 1 - i )))
-							return true;
-						if(UnitType.QUEEN==GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition(new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z - 1 - i )))
-							return true;
-						if(i==0 && UnitType.PAWN==GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition(new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z - 1 - i )))
-							return true;
-					}
-				}
-			}
-			breaker = false;
-			for (int i = 0; i < 8; i++) {		
-				if (breaker == true) {
-					break;
-				} 
-				if (checkTileFree (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z - 1 - i ))) {
-					continue;
-				} else { 
-					breaker = true;
-					if (checkHitableWhiteEnemy (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z - 1 - i ))) {
-						if(UnitType.BISHOP==GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition(new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z - 1 - i )))
-							return true;
-						if(UnitType.QUEEN==GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition(new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z - 1 - i )))
-							return true;
-						if(i==0 && UnitType.PAWN==GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition(new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z - 1 - i )))
-							return true;
-					}
-				}
-			}
-			breaker = false;
-			for (int i = 0; i < 8; i++) {		
-				if (breaker == true) {
-					break;
-				} 
-				if (checkTileFree (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z + 1 + i ))) {
-					continue;
-				} else { 
-					breaker = true;
-					if (checkHitableWhiteEnemy (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z + 1 + i ))) {
-						if(UnitType.BISHOP==GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition(new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z + 1 + i )))
-							return true;
-						if(UnitType.QUEEN==GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition(new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z + 1 + i )))
-							return true;
-					}
-				}
-			}
-
-
-
-			// rook (includes queen's some paths)
-
-
-			breaker = false;
-			for (int i = 0; i < 8; i++) {		
-				if (breaker == true) {
-					break;
-				} 
-				if (checkTileFree (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z))) {
-					continue;
-				} else { 
-					breaker = true;
-					if (checkHitableWhiteEnemy (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z))) {
-						if(UnitType.ROOK==GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition(new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z )))
-							return true;
-						if(UnitType.QUEEN==GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition(new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z )))
-							return true;
-					}
-				}
-			}
-			breaker = false;
-			for (int i = 0; i < 8; i++) {		
-				if (breaker == true) {
-					break;
-				} 
-				if (checkTileFree (new Vector3 (kingPos.x, kingPos.y, kingPos.z - 1 - i ))) {
-					continue;
-				} else { 
-					breaker = true;
-					if (checkHitableWhiteEnemy (new Vector3 (kingPos.x, kingPos.y, kingPos.z - 1 - i ))) {
-						if(UnitType.ROOK==GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition(new Vector3 (kingPos.x, kingPos.y, kingPos.z - 1 - i )))
-							return true;
-						if(UnitType.QUEEN==GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition(new Vector3 (kingPos.x, kingPos.y, kingPos.z - 1 - i )))
-							return true;
-					}
-				}
-			}
-			breaker = false;
-			for (int i = 0; i < 8; i++) {		
-				if (breaker == true) {
-					break;
-				} 
-				if (checkTileFree (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z ))) {
-					continue;
-				} else { 
-					breaker = true;
-					if (checkHitableWhiteEnemy (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z ))) {
-						if(UnitType.ROOK==GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition(new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z )))
-							return true;
-						if(UnitType.QUEEN==GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition(new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z )))
-							return true;
-					}
-				}
-			}
-			breaker = false;
-			for (int i = 0; i < 8; i++) {		
-				if (breaker == true) {
-					break;
-				} 
-				if (checkTileFree (new Vector3 (kingPos.x, kingPos.y, kingPos.z + 1 + i ))) {
-					continue;
-				} else { 
-					breaker = true;
-					if (checkHitableWhiteEnemy (new Vector3 (kingPos.x, kingPos.y, kingPos.z + 1 + i ))) {
-						if(UnitType.ROOK==GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition(new Vector3 (kingPos.x, kingPos.y, kingPos.z + 1 + i )))
-							return true;
-						if(UnitType.QUEEN==GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition(new Vector3 (kingPos.x, kingPos.y, kingPos.z + 1 + i )))
-							return true;
-					}
-				}
-			}
-
-
-		} else if (playerTurn == 1) { // After Black's turn /////////////////////////////////////////////////////////////////////////////
-			kingPos = GameObject.Find ("White").GetComponent<White> ().getKingLocation();
-
-			// knight
-			if (!checkTileFree (new Vector3 (kingPos.x + 1, kingPos.y, kingPos.z + 2 ))){
-				if (checkHitableBlackEnemy (new Vector3 (kingPos.x + 1, kingPos.y, kingPos.z + 2 ))) {
-					if(UnitType.KNIGHT==GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition(new Vector3 (kingPos.x + 1, kingPos.y, kingPos.z + 2 )))
-						return true;
-				}
-			}
-			if (!checkTileFree (new Vector3 (kingPos.x + 2, kingPos.y, kingPos.z + 1 ))){
-				if (checkHitableBlackEnemy (new Vector3 (kingPos.x + 2, kingPos.y, kingPos.z + 1 ))) {
-					if(UnitType.KNIGHT==GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition(new Vector3 (kingPos.x + 2, kingPos.y, kingPos.z + 1 )))
-						return true;
-				}
-			}
-			if (!checkTileFree (new Vector3 (kingPos.x + 1, kingPos.y, kingPos.z + -2 ))){
-				if (checkHitableBlackEnemy (new Vector3 (kingPos.x + 1, kingPos.y, kingPos.z - 2 ))) {
-					if(UnitType.KNIGHT==GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition(new Vector3 (kingPos.x + 1, kingPos.y, kingPos.z + -2 )))
-						return true;
-				}
-			}
-			if (!checkTileFree (new Vector3 (kingPos.x + 2, kingPos.y, kingPos.z -1 ))){
-				if (checkHitableBlackEnemy (new Vector3 (kingPos.x + 2, kingPos.y, kingPos.z - 1 ))) {
-					if (UnitType.KNIGHT.Equals(GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (new Vector3 (kingPos.x + 2, kingPos.y, kingPos.z -1)))) {
-						return true;
-					}
-				}
-			}
-			if (!checkTileFree (new Vector3 (kingPos.x + -1, kingPos.y, kingPos.z + -2 ))){
-				if (checkHitableBlackEnemy (new Vector3 (kingPos.x - 1, kingPos.y, kingPos.z - 2 ))) {
-					if(UnitType.KNIGHT==GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition(new Vector3 (kingPos.x + -1, kingPos.y, kingPos.z + -2 )))
-						return true;
-				}
-			}
-			if (!checkTileFree (new Vector3 (kingPos.x + -2, kingPos.y, kingPos.z + -1 ))){
-				if (checkHitableBlackEnemy (new Vector3 (kingPos.x - 2, kingPos.y, kingPos.z - 1 ))) {
-					if(UnitType.KNIGHT==GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition(new Vector3 (kingPos.x + -2, kingPos.y, kingPos.z + -1 )))
-						return true;
-				}
-			}
-			if (!checkTileFree (new Vector3 (kingPos.x + -1, kingPos.y, kingPos.z + 2 ))){
-				if (checkHitableBlackEnemy (new Vector3 (kingPos.x - 1, kingPos.y, kingPos.z + 2 ))) {
-					if(UnitType.KNIGHT==GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition(new Vector3 (kingPos.x + -1, kingPos.y, kingPos.z + 2 )))
-						return true;
-				}
-			}
-			if (!checkTileFree (new Vector3 (kingPos.x + -2, kingPos.y, kingPos.z + 1 ))){
-				if (checkHitableBlackEnemy (new Vector3 (kingPos.x - 2, kingPos.y, kingPos.z + 1 ))) {
-					if(UnitType.KNIGHT==GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition(new Vector3 (kingPos.x + -2, kingPos.y, kingPos.z + 1 )))
-						return true;
-				}
-			}
-
-
-			// bishop (includes queen's some paths and the pawn's attack)
-
-			bool breaker = false;
-			for (int i = 0; i < 8; i++) {		
-				if (breaker == true) {
-					break;
-				} 
-				if (checkTileFree (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z + 1 + i ))) {
-					continue;
-				} else { 
-					breaker = true;
-					if (checkHitableBlackEnemy (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z + 1 + i ))) {
-						if(UnitType.BISHOP==GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition(new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z + 1 + i )))
-							return true;
-						if(UnitType.QUEEN==GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition(new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z + 1 + i )))
-							return true;
-						if(i==0 && UnitType.PAWN==GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition(new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z + 1 + i )))
-							return true;
-					}
-				}
-			}
-			breaker = false;
-			for (int i = 0; i < 8; i++) {		
-				if (breaker == true) {
-					break;
-				} 
-				if (checkTileFree (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z - 1 - i ))) {
-					continue;
-				} else { 
-					breaker = true;
-					if (checkHitableBlackEnemy (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z - 1 - i ))) {
-						if(UnitType.BISHOP==GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition(new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z - 1 - i )))
-							return true;
-						if(UnitType.QUEEN==GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition(new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z - 1 - i )))
-							return true;
-					}
-				}
-			}
-			breaker = false;
-			for (int i = 0; i < 8; i++) {		
-				if (breaker == true) {
-					break;
-				} 
-				if (checkTileFree (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z - 1 - i ))) {
-					continue;
-				} else { 
-					breaker = true;
-					if (checkHitableBlackEnemy (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z - 1 - i ))) {
-						if(UnitType.BISHOP==GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition(new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z - 1 - i )))
-							return true;
-						if(UnitType.QUEEN==GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition(new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z - 1 - i )))
-							return true;
-					}
-				}
-			}
-			breaker = false;
-			for (int i = 0; i < 8; i++) {		
-				if (breaker == true) {
-					break;
-				} 
-				if (checkTileFree (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z + 1 + i ))) {
-					continue;
-				} else { 
-					breaker = true;
-					if (checkHitableBlackEnemy (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z + 1 + i ))) {
-						if(UnitType.BISHOP==GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition(new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z + 1 + i )))
-							return true;
-						if(UnitType.QUEEN==GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition(new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z + 1 + i )))
-							return true;
-						if(i==0 && UnitType.PAWN==GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition(new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z + 1 + i )))
-							return true;
-					}
-				}
-			}
-
-
-
-			// rook (includes queen's some paths)
-
-
-			breaker = false;
-			for (int i = 0; i < 8; i++) {		
-				if (breaker == true) {
-					break;
-				} 
-				if (checkTileFree (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z))) {
-					continue;
-				} else { 
-					breaker = true;
-					if (checkHitableBlackEnemy (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z))) {
-						if(UnitType.ROOK==GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition(new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z )))
-							return true;
-						if(UnitType.QUEEN==GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition(new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z )))
-							return true;
-					}
-				}
-			}
-			breaker = false;
-			for (int i = 0; i < 8; i++) {		
-				if (breaker == true) {
-					break;
-				} 
-				if (checkTileFree (new Vector3 (kingPos.x, kingPos.y, kingPos.z - 1 - i ))) {
-					continue;
-				} else { 
-					breaker = true;
-					if (checkHitableBlackEnemy (new Vector3 (kingPos.x, kingPos.y, kingPos.z - 1 - i ))) {
-						if(UnitType.ROOK==GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition(new Vector3 (kingPos.x, kingPos.y, kingPos.z - 1 - i )))
-							return true;
-						if(UnitType.QUEEN==GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition(new Vector3 (kingPos.x, kingPos.y, kingPos.z - 1 - i )))
-							return true;
-					}
-				}
-			}
-			breaker = false;
-			for (int i = 0; i < 8; i++) {		
-				if (breaker == true) {
-					break;
-				} 
-				if (checkTileFree (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z ))) {
-					continue;
-				} else { 
-					breaker = true;
-					if (checkHitableBlackEnemy (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z ))) {
-						if(UnitType.ROOK==GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition(new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z )))
-							return true;
-						if(UnitType.QUEEN==GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition(new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z )))
-							return true;
-					}
-				}
-			}
-			breaker = false;
-			for (int i = 0; i < 8; i++) {		
-				if (breaker == true) {
-					break;
-				} 
-				if (checkTileFree (new Vector3 (kingPos.x, kingPos.y, kingPos.z + 1 + i ))) {
-					continue;
-				} else { 
-					breaker = true;
-					if (checkHitableBlackEnemy (new Vector3 (kingPos.x, kingPos.y, kingPos.z + 1 + i ))) {
-						if(UnitType.ROOK==GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition(new Vector3 (kingPos.x, kingPos.y, kingPos.z + 1 + i )))
-							return true;
-						if(UnitType.QUEEN==GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition(new Vector3 (kingPos.x, kingPos.y, kingPos.z + 1 + i )))
-							return true;
-					}
-				}
-			}
-
-
-		} else
-			return	 false;
-		return false;
-	}
+//	public bool isCheck (int playerTurn) { // white played turn, check isCheck on black's king
+//		Vector3 kingPos;
+//		if (playerTurn == 0) { // After White's turn
+//			Debug.Log ("Black's turn");
+//			kingPos = GameObject.Find ("Black").GetComponent<Black> ().getKingLocation ();
+//			// check line of seight for each type of unit
+//			// knight
+//			if (!checkTileFree (new Vector3 (kingPos.x + 1, kingPos.y, kingPos.z + 2))) {
+//				if (checkHitableWhiteEnemy (new Vector3 (kingPos.x + 1, kingPos.y, kingPos.z + 2))) {
+//					if (UnitType.KNIGHT == GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (new Vector3 (kingPos.x + 1, kingPos.y, kingPos.z + 2)))
+//						return true;
+//				}
+//			}
+//			if (!checkTileFree (new Vector3 (kingPos.x + 2, kingPos.y, kingPos.z + 1))) {
+//				if (checkHitableWhiteEnemy (new Vector3 (kingPos.x + 2, kingPos.y, kingPos.z + 1))) {
+//					if (UnitType.KNIGHT == GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (new Vector3 (kingPos.x + 2, kingPos.y, kingPos.z + 1)))
+//						return true;
+//				}
+//			}
+//			if (!checkTileFree (new Vector3 (kingPos.x + 1, kingPos.y, kingPos.z + -2))) {
+//				if (checkHitableWhiteEnemy (new Vector3 (kingPos.x + 1, kingPos.y, kingPos.z - 2))) {
+//					if (UnitType.KNIGHT == GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (new Vector3 (kingPos.x + 1, kingPos.y, kingPos.z + -2)))
+//						return true;
+//				}
+//			}
+//			if (!checkTileFree (new Vector3 (kingPos.x + 2, kingPos.y, kingPos.z - 1))) {
+//				if (checkHitableWhiteEnemy (new Vector3 (kingPos.x + 2, kingPos.y, kingPos.z - 1))) {
+//					if (UnitType.KNIGHT.Equals (GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (new Vector3 (kingPos.x + 2, kingPos.y, kingPos.z - 1)))) {
+//						return true;
+//					}
+//				}
+//			}
+//			if (!checkTileFree (new Vector3 (kingPos.x + -1, kingPos.y, kingPos.z + -2))) {
+//				if (checkHitableWhiteEnemy (new Vector3 (kingPos.x - 1, kingPos.y, kingPos.z - 2))) {
+//					if (UnitType.KNIGHT == GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (new Vector3 (kingPos.x + -1, kingPos.y, kingPos.z + -2)))
+//						return true;
+//				}
+//			}
+//			if (!checkTileFree (new Vector3 (kingPos.x + -2, kingPos.y, kingPos.z + -1))) {
+//				if (checkHitableWhiteEnemy (new Vector3 (kingPos.x - 2, kingPos.y, kingPos.z - 1))) {
+//					if (UnitType.KNIGHT == GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (new Vector3 (kingPos.x + -2, kingPos.y, kingPos.z + -1)))
+//						return true;
+//				}
+//			}
+//			if (!checkTileFree (new Vector3 (kingPos.x + -1, kingPos.y, kingPos.z + 2))) {
+//				if (checkHitableWhiteEnemy (new Vector3 (kingPos.x - 1, kingPos.y, kingPos.z + 2))) {
+//					if (UnitType.KNIGHT == GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (new Vector3 (kingPos.x + -1, kingPos.y, kingPos.z + 2)))
+//						return true;
+//				}
+//			}
+//			if (!checkTileFree (new Vector3 (kingPos.x + -2, kingPos.y, kingPos.z + 1))) {
+//				if (checkHitableWhiteEnemy (new Vector3 (kingPos.x - 2, kingPos.y, kingPos.z + 1))) {
+//					if (UnitType.KNIGHT == GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (new Vector3 (kingPos.x + -2, kingPos.y, kingPos.z + 1)))
+//						return true;
+//				}
+//			}
+//
+//			// bishop (includes queen's some paths and the pawn's attack)
+//
+//			bool breaker = false;
+//			for (int i = 0; i < 8; i++) {		
+//				if (breaker == true) {
+//					break;
+//				} 
+//				if (checkTileFree (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z + 1 + i))) {
+//					continue;
+//				} else { 
+//					breaker = true;
+//					if (checkHitableWhiteEnemy (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z + 1 + i))) {
+//						if (UnitType.BISHOP == GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z + 1 + i)))
+//							return true;
+//						if (UnitType.QUEEN == GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z + 1 + i)))
+//							return true;
+//					}
+//				}
+//			}
+//			breaker = false;
+//			for (int i = 0; i < 8; i++) {		
+//				if (breaker == true) {
+//					break;
+//				} 
+//				if (checkTileFree (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z - 1 - i))) {
+//					continue;
+//				} else { 
+//					breaker = true;
+//					if (checkHitableWhiteEnemy (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z - 1 - i))) {
+//						if (UnitType.BISHOP == GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z - 1 - i)))
+//							return true;
+//						if (UnitType.QUEEN == GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z - 1 - i)))
+//							return true;
+//						if (i == 0 && UnitType.PAWN == GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z - 1 - i)))
+//							return true;
+//					}
+//				}
+//			}
+//			breaker = false;
+//			for (int i = 0; i < 8; i++) {		
+//				if (breaker == true) {
+//					break;
+//				} 
+//				if (checkTileFree (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z - 1 - i))) {
+//					continue;
+//				} else { 
+//					breaker = true;
+//					if (checkHitableWhiteEnemy (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z - 1 - i))) {
+//						if (UnitType.BISHOP == GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z - 1 - i)))
+//							return true;
+//						if (UnitType.QUEEN == GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z - 1 - i)))
+//							return true;
+//						if (i == 0 && UnitType.PAWN == GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z - 1 - i)))
+//							return true;
+//					}
+//				}
+//			}
+//			breaker = false;
+//			for (int i = 0; i < 8; i++) {		
+//				if (breaker == true) {
+//					break;
+//				} 
+//				if (checkTileFree (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z + 1 + i))) {
+//					continue;
+//				} else { 
+//					breaker = true;
+//					if (checkHitableWhiteEnemy (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z + 1 + i))) {
+//						if (UnitType.BISHOP == GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z + 1 + i)))
+//							return true;
+//						if (UnitType.QUEEN == GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z + 1 + i)))
+//							return true;
+//					}
+//				}
+//			}
+//
+//
+//
+//			// rook (includes queen's some paths)
+//
+//
+//			breaker = false;
+//			for (int i = 0; i < 8; i++) {		
+//				if (breaker == true) {
+//					break;
+//				} 
+//				if (checkTileFree (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z))) {
+//					continue;
+//				} else { 
+//					breaker = true;
+//					if (checkHitableWhiteEnemy (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z))) {
+//						if (UnitType.ROOK == GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z)))
+//							return true;
+//						if (UnitType.QUEEN == GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z)))
+//							return true;
+//					}
+//				}
+//			}
+//			breaker = false;
+//			for (int i = 0; i < 8; i++) {		
+//				if (breaker == true) {
+//					break;
+//				} 
+//				if (checkTileFree (new Vector3 (kingPos.x, kingPos.y, kingPos.z - 1 - i))) {
+//					continue;
+//				} else { 
+//					breaker = true;
+//					if (checkHitableWhiteEnemy (new Vector3 (kingPos.x, kingPos.y, kingPos.z - 1 - i))) {
+//						if (UnitType.ROOK == GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (new Vector3 (kingPos.x, kingPos.y, kingPos.z - 1 - i)))
+//							return true;
+//						if (UnitType.QUEEN == GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (new Vector3 (kingPos.x, kingPos.y, kingPos.z - 1 - i)))
+//							return true;
+//					}
+//				}
+//			}
+//			breaker = false;
+//			for (int i = 0; i < 8; i++) {		
+//				if (breaker == true) {
+//					break;
+//				} 
+//				if (checkTileFree (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z))) {
+//					continue;
+//				} else { 
+//					breaker = true;
+//					if (checkHitableWhiteEnemy (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z))) {
+//						if (UnitType.ROOK == GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z)))
+//							return true;
+//						if (UnitType.QUEEN == GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z)))
+//							return true;
+//					}
+//				}
+//			}
+//			breaker = false;
+//			for (int i = 0; i < 8; i++) {		
+//				if (breaker == true) {
+//					break;
+//				} 
+//				if (checkTileFree (new Vector3 (kingPos.x, kingPos.y, kingPos.z + 1 + i))) {
+//					continue;
+//				} else { 
+//					breaker = true;
+//					if (checkHitableWhiteEnemy (new Vector3 (kingPos.x, kingPos.y, kingPos.z + 1 + i))) {
+//						if (UnitType.ROOK == GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (new Vector3 (kingPos.x, kingPos.y, kingPos.z + 1 + i)))
+//							return true;
+//						if (UnitType.QUEEN == GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (new Vector3 (kingPos.x, kingPos.y, kingPos.z + 1 + i)))
+//							return true;
+//					}
+//				}
+//			}
+//
+//
+//		} else if (playerTurn == 1) { // After Black's turn /////////////////////////////////////////////////////////////////////////////
+//			kingPos = GameObject.Find ("White").GetComponent<White> ().getKingLocation ();
+//
+//			// knight
+//			if (!checkTileFree (new Vector3 (kingPos.x + 1, kingPos.y, kingPos.z + 2))) {
+//				if (checkHitableBlackEnemy (new Vector3 (kingPos.x + 1, kingPos.y, kingPos.z + 2))) {
+//					if (UnitType.KNIGHT == GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (new Vector3 (kingPos.x + 1, kingPos.y, kingPos.z + 2)))
+//						return true;
+//				}
+//			}
+//			if (!checkTileFree (new Vector3 (kingPos.x + 2, kingPos.y, kingPos.z + 1))) {
+//				if (checkHitableBlackEnemy (new Vector3 (kingPos.x + 2, kingPos.y, kingPos.z + 1))) {
+//					if (UnitType.KNIGHT == GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (new Vector3 (kingPos.x + 2, kingPos.y, kingPos.z + 1)))
+//						return true;
+//				}
+//			}
+//			if (!checkTileFree (new Vector3 (kingPos.x + 1, kingPos.y, kingPos.z + -2))) {
+//				if (checkHitableBlackEnemy (new Vector3 (kingPos.x + 1, kingPos.y, kingPos.z - 2))) {
+//					if (UnitType.KNIGHT == GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (new Vector3 (kingPos.x + 1, kingPos.y, kingPos.z + -2)))
+//						return true;
+//				}
+//			}
+//			if (!checkTileFree (new Vector3 (kingPos.x + 2, kingPos.y, kingPos.z - 1))) {
+//				if (checkHitableBlackEnemy (new Vector3 (kingPos.x + 2, kingPos.y, kingPos.z - 1))) {
+//					if (UnitType.KNIGHT.Equals (GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (new Vector3 (kingPos.x + 2, kingPos.y, kingPos.z - 1)))) {
+//						return true;
+//					}
+//				}
+//			}
+//			if (!checkTileFree (new Vector3 (kingPos.x + -1, kingPos.y, kingPos.z + -2))) {
+//				if (checkHitableBlackEnemy (new Vector3 (kingPos.x - 1, kingPos.y, kingPos.z - 2))) {
+//					if (UnitType.KNIGHT == GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (new Vector3 (kingPos.x + -1, kingPos.y, kingPos.z + -2)))
+//						return true;
+//				}
+//			}
+//			if (!checkTileFree (new Vector3 (kingPos.x + -2, kingPos.y, kingPos.z + -1))) {
+//				if (checkHitableBlackEnemy (new Vector3 (kingPos.x - 2, kingPos.y, kingPos.z - 1))) {
+//					if (UnitType.KNIGHT == GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (new Vector3 (kingPos.x + -2, kingPos.y, kingPos.z + -1)))
+//						return true;
+//				}
+//			}
+//			if (!checkTileFree (new Vector3 (kingPos.x + -1, kingPos.y, kingPos.z + 2))) {
+//				if (checkHitableBlackEnemy (new Vector3 (kingPos.x - 1, kingPos.y, kingPos.z + 2))) {
+//					if (UnitType.KNIGHT == GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (new Vector3 (kingPos.x + -1, kingPos.y, kingPos.z + 2)))
+//						return true;
+//				}
+//			}
+//			if (!checkTileFree (new Vector3 (kingPos.x + -2, kingPos.y, kingPos.z + 1))) {
+//				if (checkHitableBlackEnemy (new Vector3 (kingPos.x - 2, kingPos.y, kingPos.z + 1))) {
+//					if (UnitType.KNIGHT == GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (new Vector3 (kingPos.x + -2, kingPos.y, kingPos.z + 1)))
+//						return true;
+//				}
+//			}
+//
+//
+//			// bishop (includes queen's some paths and the pawn's attack)
+//
+//			bool breaker = false;
+//			for (int i = 0; i < 8; i++) {		
+//				if (breaker == true) {
+//					break;
+//				} 
+//				if (checkTileFree (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z + 1 + i))) {
+//					continue;
+//				} else { 
+//					breaker = true;
+//					if (checkHitableBlackEnemy (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z + 1 + i))) {
+//						if (UnitType.BISHOP == GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z + 1 + i)))
+//							return true;
+//						if (UnitType.QUEEN == GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z + 1 + i)))
+//							return true;
+//						if (i == 0 && UnitType.PAWN == GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z + 1 + i)))
+//							return true;
+//					}
+//				}
+//			}
+//			breaker = false;
+//			for (int i = 0; i < 8; i++) {		
+//				if (breaker == true) {
+//					break;
+//				} 
+//				if (checkTileFree (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z - 1 - i))) {
+//					continue;
+//				} else { 
+//					breaker = true;
+//					if (checkHitableBlackEnemy (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z - 1 - i))) {
+//						if (UnitType.BISHOP == GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z - 1 - i)))
+//							return true;
+//						if (UnitType.QUEEN == GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z - 1 - i)))
+//							return true;
+//					}
+//				}
+//			}
+//			breaker = false;
+//			for (int i = 0; i < 8; i++) {		
+//				if (breaker == true) {
+//					break;
+//				} 
+//				if (checkTileFree (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z - 1 - i))) {
+//					continue;
+//				} else { 
+//					breaker = true;
+//					if (checkHitableBlackEnemy (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z - 1 - i))) {
+//						if (UnitType.BISHOP == GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z - 1 - i)))
+//							return true;
+//						if (UnitType.QUEEN == GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z - 1 - i)))
+//							return true;
+//					}
+//				}
+//			}
+//			breaker = false;
+//			for (int i = 0; i < 8; i++) {		
+//				if (breaker == true) {
+//					break;
+//				} 
+//				if (checkTileFree (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z + 1 + i))) {
+//					continue;
+//				} else { 
+//					breaker = true;
+//					if (checkHitableBlackEnemy (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z + 1 + i))) {
+//						if (UnitType.BISHOP == GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z + 1 + i)))
+//							return true;
+//						if (UnitType.QUEEN == GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z + 1 + i)))
+//							return true;
+//						if (i == 0 && UnitType.PAWN == GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z + 1 + i)))
+//							return true;
+//					}
+//				}
+//			}
+//
+//
+//
+//			// rook (includes queen's some paths)
+//
+//
+//			breaker = false;
+//			for (int i = 0; i < 8; i++) {		
+//				if (breaker == true) {
+//					break;
+//				} 
+//				if (checkTileFree (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z))) {
+//					continue;
+//				} else { 
+//					breaker = true;
+//					if (checkHitableBlackEnemy (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z))) {
+//						if (UnitType.ROOK == GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z)))
+//							return true;
+//						if (UnitType.QUEEN == GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (new Vector3 (kingPos.x + 1 + i, kingPos.y, kingPos.z)))
+//							return true;
+//					}
+//				}
+//			}
+//			breaker = false;
+//			for (int i = 0; i < 8; i++) {		
+//				if (breaker == true) {
+//					break;
+//				} 
+//				if (checkTileFree (new Vector3 (kingPos.x, kingPos.y, kingPos.z - 1 - i))) {
+//					continue;
+//				} else { 
+//					breaker = true;
+//					if (checkHitableBlackEnemy (new Vector3 (kingPos.x, kingPos.y, kingPos.z - 1 - i))) {
+//						if (UnitType.ROOK == GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (new Vector3 (kingPos.x, kingPos.y, kingPos.z - 1 - i)))
+//							return true;
+//						if (UnitType.QUEEN == GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (new Vector3 (kingPos.x, kingPos.y, kingPos.z - 1 - i)))
+//							return true;
+//					}
+//				}
+//			}
+//			breaker = false;
+//			for (int i = 0; i < 8; i++) {		
+//				if (breaker == true) {
+//					break;
+//				} 
+//				if (checkTileFree (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z))) {
+//					continue;
+//				} else { 
+//					breaker = true;
+//					if (checkHitableBlackEnemy (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z))) {
+//						if (UnitType.ROOK == GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z)))
+//							return true;
+//						if (UnitType.QUEEN == GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (new Vector3 (kingPos.x - 1 - i, kingPos.y, kingPos.z)))
+//							return true;
+//					}
+//				}
+//			}
+//			breaker = false;
+//			for (int i = 0; i < 8; i++) {		
+//				if (breaker == true) {
+//					break;
+//				} 
+//				if (checkTileFree (new Vector3 (kingPos.x, kingPos.y, kingPos.z + 1 + i))) {
+//					continue;
+//				} else { 
+//					breaker = true;
+//					if (checkHitableBlackEnemy (new Vector3 (kingPos.x, kingPos.y, kingPos.z + 1 + i))) {
+//						if (UnitType.ROOK == GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (new Vector3 (kingPos.x, kingPos.y, kingPos.z + 1 + i)))
+//							return true;
+//						if (UnitType.QUEEN == GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (new Vector3 (kingPos.x, kingPos.y, kingPos.z + 1 + i)))
+//							return true;
+//					}
+//				}
+//			}
+//
+//
+//		} else
+//			return	 false;
+//		return false;
+//	}
 
 
 }

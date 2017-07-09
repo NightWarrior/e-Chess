@@ -1,0 +1,370 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class BoardStructure {
+
+	enum UnitTeam {
+		WHITE,
+		BLACK,
+		NULL}
+
+	;
+
+	struct tileStruct {
+		public UnitTeam team;
+		public UnitType piece;
+	}
+
+	tileStruct[,] board = new tileStruct[8, 8];
+	Vector2 whiteKing, blackKing;
+
+	public BoardStructure () {
+
+		whiteKing = new Vector2 ();
+		blackKing = new Vector2 ();
+
+		
+		// initialize all the pseudo-tiles by what is at the original board at the given time
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				
+				board [i, j].piece = GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (new Vector3 (i, 0, j)); // first check if a white piece at the place
+				if (board [i, j].piece != UnitType.NULL) {
+					board [i, j].team = UnitTeam.WHITE;
+					if (board [i, j].piece == UnitType.KING)
+						whiteKing = new Vector2 (i, j);
+				} else { // if no white then it initializes to NULL
+					// check if a black is at this location, else NUll is initialized
+					board [i, j].piece = GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (new Vector3 (i, 0, j)); 
+					if (board [i, j].piece != UnitType.NULL) {
+						board [i, j].team = UnitTeam.BLACK;
+						if (board [i, j].piece == UnitType.KING)
+							blackKing = new Vector2 (i, j);
+					} else
+						board [i, j].team = UnitTeam.NULL;
+				}
+			}
+		}
+	}
+
+	public bool isWhiteCheck () {
+		bool[] lineChecks = new bool[4];
+
+		// check knight's 
+		if ((int)(int)whiteKing.x + 1 < 8 && (int)whiteKing.y + 2 < 8)
+		if (board [(int)(int)whiteKing.x + 1, (int)whiteKing.y + 2].team == UnitTeam.BLACK && board [(int)whiteKing.x + 1, (int)whiteKing.y + 2].piece == UnitType.KNIGHT)
+			return true;
+		if ((int)whiteKing.x + 1 < 8 && (int)whiteKing.y - 2 > 0)
+		if (board [(int)whiteKing.x + 1, (int)whiteKing.y - 2].team == UnitTeam.BLACK && board [(int)whiteKing.x + 1, (int)whiteKing.y - 2].piece == UnitType.KNIGHT)
+			return true;
+		if ((int)whiteKing.x + 2 < 8 && (int)whiteKing.y + 1 < 8)
+		if (board [(int)whiteKing.x + 2, (int)whiteKing.y + 1].team == UnitTeam.BLACK && board [(int)whiteKing.x + 2, (int)whiteKing.y + 1].piece == UnitType.KNIGHT)
+			return true;
+		if ((int)whiteKing.x + 2 < 8 && (int)whiteKing.y - 1 > 0)
+		if (board [(int)whiteKing.x + 2, (int)whiteKing.y - 1].team == UnitTeam.BLACK && board [(int)whiteKing.x + 2, (int)whiteKing.y - 1].piece == UnitType.KNIGHT)
+			return true;
+		if ((int)whiteKing.x - 1 > 0 && (int)whiteKing.y + 2 < 8)
+		if (board [(int)whiteKing.x - 1, (int)whiteKing.y + 2].team == UnitTeam.BLACK && board [(int)whiteKing.x - 1, (int)whiteKing.y + 2].piece == UnitType.KNIGHT)
+			return true;
+		if ((int)whiteKing.x - 1 > 0 && (int)whiteKing.y - 2 > 0)
+		if (board [(int)whiteKing.x - 1, (int)whiteKing.y - 2].team == UnitTeam.BLACK && board [(int)whiteKing.x - 1, (int)whiteKing.y - 2].piece == UnitType.KNIGHT)
+			return true;
+		if ((int)whiteKing.x - 2 > 0 && (int)whiteKing.y + 1 < 8)
+		if (board [(int)whiteKing.x - 2, (int)whiteKing.y + 1].team == UnitTeam.BLACK && board [(int)whiteKing.x - 2, (int)whiteKing.y + 1].piece == UnitType.KNIGHT)
+			return true;
+		if ((int)whiteKing.x - 2 > 0 && (int)whiteKing.y - 1 > 0)
+		if (board [(int)whiteKing.x - 2, (int)whiteKing.y - 1].team == UnitTeam.BLACK && board [(int)whiteKing.x - 2, (int)whiteKing.y - 1].piece == UnitType.KNIGHT)
+			return true;
+
+		// check bishop, queen, pawn
+		lineChecks [0] = lineChecks [1] = lineChecks [2] = lineChecks [3] = true;
+		for (int i = 1; i < 8; i++) {
+			if (lineChecks [0] && (int)whiteKing.x + i < 8 && (int)whiteKing.y + i < 8) {
+				if (board [(int)whiteKing.x + i, (int)whiteKing.y + i].team == UnitTeam.BLACK && board [(int)whiteKing.x + i, (int)whiteKing.y + i].piece == UnitType.BISHOP)
+					return true;
+				if (board [(int)whiteKing.x + i, (int)whiteKing.y + i].team == UnitTeam.BLACK && board [(int)whiteKing.x + i, (int)whiteKing.y + i].piece == UnitType.QUEEN)
+					return true;
+				if (i == 1 && board [(int)whiteKing.x + i, (int)whiteKing.y + i].team == UnitTeam.BLACK && board [(int)whiteKing.x + i, (int)whiteKing.y + i].piece == UnitType.PAWN)
+					return true;
+
+				if (board [(int)whiteKing.x + i, (int)whiteKing.y + i].team != UnitTeam.NULL) // if the path isnt clear then its skip the rest in that line
+					lineChecks [0] = false;
+			}
+			if (lineChecks [1] && (int)whiteKing.x + i < 8 && (int)whiteKing.y - i > 0) {
+				if (board [(int)whiteKing.x + i, (int)whiteKing.y - i].team == UnitTeam.BLACK && board [(int)whiteKing.x + i, (int)whiteKing.y - i].piece == UnitType.BISHOP)
+					return true;
+				if (board [(int)whiteKing.x + i, (int)whiteKing.y - i].team == UnitTeam.BLACK && board [(int)whiteKing.x + i, (int)whiteKing.y - i].piece == UnitType.QUEEN)
+					return true;
+
+				if (board [(int)whiteKing.x + i, (int)whiteKing.y - i].team != UnitTeam.NULL)
+					lineChecks [1] = false;
+			}
+			if (lineChecks [2] && (int)whiteKing.x - i > 0 && (int)whiteKing.y + i < 8) {
+				if (board [(int)whiteKing.x - i, (int)whiteKing.y + i].team == UnitTeam.BLACK && board [(int)whiteKing.x - i, (int)whiteKing.y + i].piece == UnitType.BISHOP)
+					return true;
+				if (board [(int)whiteKing.x - i, (int)whiteKing.y + i].team == UnitTeam.BLACK && board [(int)whiteKing.x - i, (int)whiteKing.y + i].piece == UnitType.QUEEN)
+					return true;
+				if (i == 1 && board [(int)whiteKing.x - i, (int)whiteKing.y + i].team == UnitTeam.BLACK && board [(int)whiteKing.x - i, (int)whiteKing.y + i].piece == UnitType.PAWN)
+					return true;
+
+				if (board [(int)whiteKing.x - i, (int)whiteKing.y + i].team != UnitTeam.NULL)
+					lineChecks [2] = false;
+			}
+			if (lineChecks [3] && (int)whiteKing.x - i > 0 && (int)whiteKing.y - i > 0) {
+				if (board [(int)whiteKing.x - i, (int)whiteKing.y - i].team == UnitTeam.BLACK && board [(int)whiteKing.x - i, (int)whiteKing.y - i].piece == UnitType.BISHOP)
+					return true;
+				if (board [(int)whiteKing.x - i, (int)whiteKing.y - i].team == UnitTeam.BLACK && board [(int)whiteKing.x - i, (int)whiteKing.y - i].piece == UnitType.QUEEN)
+					return true;
+
+				if (board [(int)whiteKing.x - i, (int)whiteKing.y - i].team != UnitTeam.NULL)
+					lineChecks [3] = false;
+			}
+
+		}
+
+		// check rook, queen
+		lineChecks [0] = lineChecks [1] = lineChecks [2] = lineChecks [3] = true;
+		for (int i = 1; i < 8; i++) {
+			if ((int)whiteKing.x + i < 8) {
+				if (lineChecks [0]) {
+					if (board [(int)whiteKing.x + i, (int)whiteKing.y].team == UnitTeam.BLACK && board [(int)whiteKing.x + i, (int)whiteKing.y].piece == UnitType.ROOK)
+						return true;
+					if (board [(int)whiteKing.x + i, (int)whiteKing.y].team == UnitTeam.BLACK && board [(int)whiteKing.x + i, (int)whiteKing.y].piece == UnitType.QUEEN)
+						return true;
+
+					if (board [(int)whiteKing.x + i, (int)whiteKing.y].team != UnitTeam.NULL)
+						lineChecks [0] = false;
+				}
+			}
+			if ((int)whiteKing.y + i < 8) {
+				if (lineChecks [1]) {
+					if (board [(int)whiteKing.x, (int)whiteKing.y + i].team == UnitTeam.BLACK && board [(int)whiteKing.x, (int)whiteKing.y + i].piece == UnitType.ROOK)
+						return true;
+					if (board [(int)whiteKing.x, (int)whiteKing.y + i].team == UnitTeam.BLACK && board [(int)whiteKing.x, (int)whiteKing.y + i].piece == UnitType.QUEEN)
+						return true;
+
+					if (board [(int)whiteKing.x, (int)whiteKing.y + i].team != UnitTeam.NULL)
+						lineChecks [1] = false;
+				}
+			}
+			if ((int)whiteKing.x - i > 0) {
+				if (lineChecks [2]) {
+					if (board [(int)whiteKing.x - i, (int)whiteKing.y].team == UnitTeam.BLACK && board [(int)whiteKing.x - i, (int)whiteKing.y].piece == UnitType.ROOK)
+						return true;
+					if (board [(int)whiteKing.x - i, (int)whiteKing.y].team == UnitTeam.BLACK && board [(int)whiteKing.x - i, (int)whiteKing.y].piece == UnitType.QUEEN)
+						return true;
+
+					if (board [(int)whiteKing.x - i, (int)whiteKing.y].team != UnitTeam.NULL)
+						lineChecks [2] = false;
+				}
+
+			}
+			if ((int)whiteKing.y - i > 0) {
+				if (lineChecks [3]) {
+					if (board [(int)whiteKing.x, (int)whiteKing.y - i].team == UnitTeam.BLACK && board [(int)whiteKing.x, (int)whiteKing.y - i].piece == UnitType.ROOK)
+						return true;
+					if (board [(int)whiteKing.x, (int)whiteKing.y - i].team == UnitTeam.BLACK && board [(int)whiteKing.x, (int)whiteKing.y - i].piece == UnitType.QUEEN)
+						return true;
+
+					if (board [(int)whiteKing.x, (int)whiteKing.y - i].team != UnitTeam.NULL)
+						lineChecks [3] = false;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	public bool isBlackCheck () {
+		bool[] lineChecks = new bool[4];
+
+		// check knight's 
+		if ((int)(int)blackKing.x + 1 < 8 && (int)blackKing.y + 2 < 8)
+		if (board [(int)(int)blackKing.x + 1, (int)blackKing.y + 2].team == UnitTeam.WHITE && board [(int)blackKing.x + 1, (int)blackKing.y + 2].piece == UnitType.KNIGHT)
+			return true;
+		if ((int)blackKing.x + 1 < 8 && (int)blackKing.y - 2 > 0)
+		if (board [(int)blackKing.x + 1, (int)blackKing.y - 2].team == UnitTeam.WHITE && board [(int)blackKing.x + 1, (int)blackKing.y - 2].piece == UnitType.KNIGHT)
+			return true;
+		if ((int)blackKing.x + 2 < 8 && (int)blackKing.y + 1 < 8)
+		if (board [(int)blackKing.x + 2, (int)blackKing.y + 1].team == UnitTeam.WHITE && board [(int)blackKing.x + 2, (int)blackKing.y + 1].piece == UnitType.KNIGHT)
+			return true;
+		if ((int)blackKing.x + 2 < 8 && (int)blackKing.y - 1 > 0)
+		if (board [(int)blackKing.x + 2, (int)blackKing.y - 1].team == UnitTeam.WHITE && board [(int)blackKing.x + 2, (int)blackKing.y - 1].piece == UnitType.KNIGHT)
+			return true;
+		if ((int)blackKing.x - 1 > 0 && (int)blackKing.y + 2 < 8)
+		if (board [(int)blackKing.x - 1, (int)blackKing.y + 2].team == UnitTeam.WHITE && board [(int)blackKing.x - 1, (int)blackKing.y + 2].piece == UnitType.KNIGHT)
+			return true;
+		if ((int)blackKing.x - 1 > 0 && (int)blackKing.y - 2 > 0)
+		if (board [(int)blackKing.x - 1, (int)blackKing.y - 2].team == UnitTeam.WHITE && board [(int)blackKing.x - 1, (int)blackKing.y - 2].piece == UnitType.KNIGHT)
+			return true;
+		if ((int)blackKing.x - 2 > 0 && (int)blackKing.y + 1 < 8)
+		if (board [(int)blackKing.x - 2, (int)blackKing.y + 1].team == UnitTeam.WHITE && board [(int)blackKing.x - 2, (int)blackKing.y + 1].piece == UnitType.KNIGHT)
+			return true;
+		if ((int)blackKing.x - 2 > 0 && (int)blackKing.y - 1 > 0)
+		if (board [(int)blackKing.x - 2, (int)blackKing.y - 1].team == UnitTeam.WHITE && board [(int)blackKing.x - 2, (int)blackKing.y - 1].piece == UnitType.KNIGHT)
+			return true;
+
+		// check bishop, queen, pawn
+		lineChecks [0] = lineChecks [1] = lineChecks [2] = lineChecks [3] = true;
+		for (int i = 1; i < 8; i++) {
+			if (lineChecks [0] && (int)blackKing.x + i < 8 && (int)blackKing.y + i < 8) {
+				if (board [(int)blackKing.x + i, (int)blackKing.y + i].team == UnitTeam.WHITE && board [(int)blackKing.x + i, (int)blackKing.y + i].piece == UnitType.BISHOP)
+					return true;
+				if (board [(int)blackKing.x + i, (int)blackKing.y + i].team == UnitTeam.WHITE && board [(int)blackKing.x + i, (int)blackKing.y + i].piece == UnitType.QUEEN)
+					return true;
+
+				if (board [(int)blackKing.x + i, (int)blackKing.y + i].team != UnitTeam.NULL) // if the path isnt clear then its skip the rest in that line
+					lineChecks [0] = false;
+			}
+			if (lineChecks [1] && (int)blackKing.x + i < 8 && (int)blackKing.y - i > 0) {
+				if (board [(int)blackKing.x + i, (int)blackKing.y - i].team == UnitTeam.WHITE && board [(int)blackKing.x + i, (int)blackKing.y - i].piece == UnitType.BISHOP)
+					return true;
+				if (board [(int)blackKing.x + i, (int)blackKing.y - i].team == UnitTeam.WHITE && board [(int)blackKing.x + i, (int)blackKing.y - i].piece == UnitType.QUEEN)
+					return true;
+				if (i == 1 && board [(int)blackKing.x + i, (int)blackKing.y - i].team == UnitTeam.WHITE && board [(int)blackKing.x + i, (int)blackKing.y - i].piece == UnitType.PAWN)
+					return true;
+
+				if (board [(int)blackKing.x + i, (int)blackKing.y - i].team != UnitTeam.NULL)
+					lineChecks [1] = false;
+			}
+			if (lineChecks [2] && (int)blackKing.x - i > 0 && (int)blackKing.y + i < 8) {
+				if (board [(int)blackKing.x - i, (int)blackKing.y + i].team == UnitTeam.WHITE && board [(int)blackKing.x - i, (int)blackKing.y + i].piece == UnitType.BISHOP)
+					return true;
+				if (board [(int)blackKing.x - i, (int)blackKing.y + i].team == UnitTeam.WHITE && board [(int)blackKing.x - i, (int)blackKing.y + i].piece == UnitType.QUEEN)
+					return true;
+
+				if (board [(int)blackKing.x - i, (int)blackKing.y + i].team != UnitTeam.NULL)
+					lineChecks [2] = false;
+			}
+			if (lineChecks [3] && (int)blackKing.x - i > 0 && (int)blackKing.y - i > 0) {
+				if (board [(int)blackKing.x - i, (int)blackKing.y - i].team == UnitTeam.WHITE && board [(int)blackKing.x - i, (int)blackKing.y - i].piece == UnitType.BISHOP)
+					return true;
+				if (board [(int)blackKing.x - i, (int)blackKing.y - i].team == UnitTeam.WHITE && board [(int)blackKing.x - i, (int)blackKing.y - i].piece == UnitType.QUEEN)
+					return true;
+				if (i == 1 && board [(int)blackKing.x - i, (int)blackKing.y - i].team == UnitTeam.WHITE && board [(int)blackKing.x - i, (int)blackKing.y - i].piece == UnitType.PAWN)
+					return true;
+
+				if (board [(int)blackKing.x - i, (int)blackKing.y - i].team != UnitTeam.NULL)
+					lineChecks [3] = false;
+			}
+
+		}
+
+		// check rook, queen
+		lineChecks [0] = lineChecks [1] = lineChecks [2] = lineChecks [3] = true;
+		for (int i = 1; i < 8; i++) {
+			if ((int)blackKing.x + i < 8) {
+				if (lineChecks [0]) {
+					if (board [(int)blackKing.x + i, (int)blackKing.y].team == UnitTeam.WHITE && board [(int)blackKing.x + i, (int)blackKing.y].piece == UnitType.ROOK)
+						return true;
+					if (board [(int)blackKing.x + i, (int)blackKing.y].team == UnitTeam.WHITE && board [(int)blackKing.x + i, (int)blackKing.y].piece == UnitType.QUEEN)
+						return true;
+
+					if (board [(int)blackKing.x + i, (int)blackKing.y].team != UnitTeam.NULL)
+						lineChecks [0] = false;
+				}
+			}
+			if ((int)blackKing.y + i < 8) {
+				if (lineChecks [1]) {
+					//Debug.Log (blackKing + " " + (int)blackKing.y + i);
+					if (board [(int)blackKing.x, (int)blackKing.y + i].team == UnitTeam.WHITE && board [(int)blackKing.x, (int)blackKing.y + i].piece == UnitType.ROOK)
+						return true;
+					if (board [(int)blackKing.x, (int)blackKing.y + i].team == UnitTeam.WHITE && board [(int)blackKing.x, (int)blackKing.y + i].piece == UnitType.QUEEN)
+						return true;
+
+					if (board [(int)blackKing.x, (int)blackKing.y + i].team != UnitTeam.NULL)
+						lineChecks [1] = false;
+				}
+			}
+			if ((int)blackKing.x - i > 0) {
+				if (lineChecks [2]) {
+					if (board [(int)blackKing.x - i, (int)blackKing.y].team == UnitTeam.WHITE && board [(int)blackKing.x - i, (int)blackKing.y].piece == UnitType.ROOK)
+						return true;
+					if (board [(int)blackKing.x - i, (int)blackKing.y].team == UnitTeam.WHITE && board [(int)blackKing.x - i, (int)blackKing.y].piece == UnitType.QUEEN)
+						return true;
+
+					if (board [(int)blackKing.x - i, (int)blackKing.y].team != UnitTeam.NULL)
+						lineChecks [2] = false;
+				}
+			}
+			if ((int)blackKing.y - i > 0) {
+				if (lineChecks [3]) {
+					if (board [(int)blackKing.x, (int)blackKing.y - i].team == UnitTeam.WHITE && board [(int)blackKing.x, (int)blackKing.y - i].piece == UnitType.ROOK)
+						return true;
+					if (board [(int)blackKing.x, (int)blackKing.y - i].team == UnitTeam.WHITE && board [(int)blackKing.x, (int)blackKing.y - i].piece == UnitType.QUEEN)
+						return true;
+
+					if (board [(int)blackKing.x, (int)blackKing.y - i].team != UnitTeam.NULL)
+						lineChecks [3] = false;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	public bool checkMovable (Vector3 from, Vector3 to) {
+		bool moveable = true;
+		UnitTeam team = board [(int)from.x, (int)from.z].team; // team of the unit to be moved
+
+		updateBoard ();
+		move (from, to);
+		if (team == UnitTeam.BLACK) {// team of unit we are checking for movement is checked
+			moveable = isBlackCheck ();
+		} else
+			moveable = isWhiteCheck ();
+		move (to, from);
+
+		return !moveable;
+
+//		return false;
+	}
+
+	public void move (Vector3 from, Vector3 to) {
+		if (board [(int)to.x, (int)to.z].piece == UnitType.NULL) {
+			if (board [(int)from.x, (int)from.z].piece == UnitType.KING) {
+				if (board [(int)from.x, (int)from.z].team == UnitTeam.BLACK) {
+					blackKing.x = to.x;
+					blackKing.y = to.z;
+				} else {
+					whiteKing.x = to.x;
+					whiteKing.y = to.z;
+				}
+			}
+
+			board [(int)to.x, (int)to.z] = board [(int)from.z, (int)from.z];
+			board [(int)from.x, (int)from.z].piece = UnitType.NULL;
+			board [(int)from.x, (int)from.z].team = UnitTeam.NULL;
+		}
+
+	}
+
+
+	public void updateBoard () {
+
+		// initialize all the pseudo-tiles by what is at the original board at the given time
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				board [i, j].team = UnitTeam.NULL;
+				board [i, j].piece = UnitType.NULL;
+
+				board [i, j].piece = GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (new Vector3 (i, 0, j)); // first check if a white piece at the place
+				if (board [i, j].piece != UnitType.NULL) {
+					board [i, j].team = UnitTeam.WHITE;
+					if (board [i, j].piece == UnitType.KING)
+						whiteKing = new Vector2 (i, j);
+				} else { // if no white then it initializes to NULL
+					// check if a black is at this location, else NUll is initialized
+					board [i, j].piece = GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (new Vector3 (i, 0, j)); 
+					if (board [i, j].piece != UnitType.NULL) {
+						board [i, j].team = UnitTeam.BLACK;
+						if (board [i, j].piece == UnitType.KING)
+							blackKing = new Vector2 (i, j);
+					} else
+						board [i, j].team = UnitTeam.NULL;
+				}
+			}
+		}
+	}
+}

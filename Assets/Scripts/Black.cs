@@ -114,7 +114,12 @@ public class Black : MonoBehaviour {
 
 			yield return null;
 		}
-		Debug.Log("Black: check: " + GameObject.Find ("Board").GetComponent<board> ().isCheck(1));
+
+		BoardStructure bs = new BoardStructure ();
+		bs.isWhiteCheck ();
+//		Debug.Log("Black: check: " + bs.isWhiteCheck ());
+
+		//Debug.Log("Black: check: " + GameObject.Find ("Board").GetComponent<board> ().isCheck(1));
 	}
 
 	public UnitType getUnitTypeAtPosition(Vector3 pos){
