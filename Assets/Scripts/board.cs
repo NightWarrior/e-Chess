@@ -102,7 +102,8 @@ public class board : MonoBehaviour {
 
 
 	public bool checkHitableWhiteEnemy (Vector3 pos, Vector3 piecePos) {
-		if (GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (pos) != UnitType.NULL) {
+		if (GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (pos) != UnitType.NULL || 
+			(GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (pos)  == UnitType.NULL && GameObject.Find ("White").GetComponent<White> ().isInPassing(pos, piecePos))) {
 			BoardStructure bs = new BoardStructure ();
 			return bs.checkMovable (piecePos, pos);
 		}
@@ -118,7 +119,8 @@ public class board : MonoBehaviour {
 	}
 
 	public bool checkHitableBlackEnemy (Vector3 pos, Vector3 piecePos) {
-		if (GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (pos) != UnitType.NULL) {
+		if (GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (pos) != UnitType.NULL || 
+			(GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (pos)  == UnitType.NULL && GameObject.Find ("Black").GetComponent<Black> ().isInPassing(pos, piecePos))) {
 			BoardStructure bs = new BoardStructure ();
 			return bs.checkMovable (piecePos, pos);
 		}

@@ -48,7 +48,7 @@ public class BoardStructure {
 		}
 	}
 
-	public bool checkMovable (Vector3 from, Vector3 to) {
+	public bool checkMovable (Vector3 from, Vector3 to) { // checking if the movers own team goes into check from making the move
 		bool moveable = true;
 		UnitTeam team = board [(int)from.x, (int)from.z].team; // team of the unit to be moved
 
@@ -67,7 +67,7 @@ public class BoardStructure {
 
 	public void move (Vector3 from, Vector3 to) {
 		if (board [(int)from.x, (int)from.z].piece == UnitType.KING) {
-			if (board [(int)from.x, (int)from.z].team == UnitTeam.BLACK) {
+			if (board [(int)from.x, (int)from.z].team == UnitTeam.BLACK) { // updating the separate record of each king
 				blackKing.x = to.x;
 				blackKing.y = to.z;
 			} else {
@@ -111,8 +111,8 @@ public class BoardStructure {
 		}
 	}
 
-	public bool isWhiteCheck () {
-		bool[] lineChecks = new bool[4];
+	public bool isWhiteCheck () { // checking if white is in check with the current situation
+		bool[] lineChecks = new bool[4]; // used to keep track of each x or + paths pieces to see how far they extend 
 
 		// check king's
 		if ((int)whiteKing.x + 1 < 8)

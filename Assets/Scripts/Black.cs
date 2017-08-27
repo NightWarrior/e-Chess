@@ -28,6 +28,9 @@ public class Black : MonoBehaviour {
 	public bool castleRook1;
 	public bool castleRook2;
 	public bool castleKing;
+	public bool inPassing;
+
+	public Vector3 inPassingPawn;
 
 
 	Vector3 trash = new Vector3(-5, 0, -5);
@@ -38,6 +41,8 @@ public class Black : MonoBehaviour {
 		castleRook1 = true;
 		castleRook2 = true;
 		castleKing = true;
+
+		inPassing = false;
 	}
 
 	public void hasCastled(){
@@ -118,6 +123,11 @@ public class Black : MonoBehaviour {
 	IEnumerator smoothMoveToLocationRoutine (Vector3 pos1, Vector3 pos2, GameObject obj) {
 		float t = 0.0f;
 
+		// adjusting for inPassing move
+		if (GameObject.Find ("White").GetComponent<White> ().isInPassing (pos2, pos1)) {
+			GameObject.Find ("White").GetComponent<White> ().removeUnit (GameObject.Find ("White").GetComponent<White> ().inPassingPawn);
+		}
+
 		while (obj.transform.position != pos2) {
 
 			obj.transform.position = new Vector3 (Mathf.Lerp (pos1.x, pos2.x, t),
@@ -130,15 +140,40 @@ public class Black : MonoBehaviour {
 			yield return null;
 		}
 
+		if (pos1.z == 6 && pos2.z == 4 && pos1.x == pos2.x && getUnitTypeAtPosition (pos2) == UnitType.PAWN){ // check if inPassing should be set to true
+			inPassing = true;
+			inPassingPawn = new Vector3 (pos2.x, pos2.y, pos2.z);
+		}
+
 		BoardStructure bs = new BoardStructure ();
 		if (bs.isWhiteCheck ()) {
 			GameObject.Find ("GameManager").GetComponent<gameManager> ().check = true;
-			GameObject.Find ("CheckText").GetComponent<Text> ().text = "King in check.";
+			GameObject.Find ("CheckText").GetComponent<Text> ().text = "White King in check.";
 //			Debug.Log("After Black' turn: checkmate: " + GameObject.Find ("Board").GetComponent<board> ().isWhiteCheckmate());
 			if (GameObject.Find ("Board").GetComponent<board> ().isWhiteCheckmate ()) {
 				GameObject.Find ("GameManager").GetComponent<gameManager> ().resetGame ("Black wins\nPress any key to restart.");
 			}
 		}
+
+		GameObject.Find ("White").GetComponent<White> ().disableInPassing ();
+	}
+
+	public void disableInPassing(){
+		if (inPassing)
+			inPassing = false;
+	}
+
+	public bool isInPassing(){
+		return inPassing;
+	}
+
+	public bool isInPassing(Vector3 pos, Vector3 killerPiecePos){
+		if (!isInPassing () || GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (killerPiecePos) != UnitType.PAWN)
+			return false;
+		if (pos.z-1 == inPassingPawn.z && pos.x == inPassingPawn.x) {
+			return true;
+		}
+		return false;
 	}
 
 	public UnitType getUnitTypeAtPosition (Vector3 pos) {
