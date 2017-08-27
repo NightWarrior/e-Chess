@@ -11,6 +11,8 @@ public class gameManager : MonoBehaviour {
 	private bool gameReset;
 	public bool check;
 
+	public bool AI;
+
 	public bool Check {
 		get {
 			return check;
@@ -27,7 +29,10 @@ public class gameManager : MonoBehaviour {
 		GameObject.FindWithTag ("Finish").GetComponent<Text> ().text = "";
 		GameObject.Find ("CheckText").GetComponent<Text> ().text = "";
 
-		Debug.Log (PlayerPrefs.GetInt("AIGame"));
+		if (PlayerPrefs.GetInt ("AIGame") == 1)
+			AI = true;
+		else
+			AI = false;
 	}
 
 	public int TurnColor {

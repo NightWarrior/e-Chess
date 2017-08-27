@@ -4,31 +4,32 @@ using UnityEngine;
 
 public class BoardStructure {
 
-	enum UnitTeam {
+	public enum UnitTeam {
 		WHITE,
 		BLACK,
 		NULL}
 
 	;
 
-	struct tileStruct {
+	public struct tileStruct {
 		public UnitTeam team;
 		public UnitType piece;
 	}
 
-	tileStruct[,] board = new tileStruct[8, 8];
+	public tileStruct[,] board; 
 	Vector2 whiteKing, blackKing;
 
 	public BoardStructure () {
+		board = new tileStruct[8, 8];
 
 		whiteKing = new Vector2 ();
 		blackKing = new Vector2 ();
 
-		
+
 		// initialize all the pseudo-tiles by what is at the original board at the given time
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
-				
+
 				board [i, j].piece = GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (new Vector3 (i, 0, j)); // first check if a white piece at the place
 				if (board [i, j].piece != UnitType.NULL) {
 					board [i, j].team = UnitTeam.WHITE;
@@ -48,7 +49,67 @@ public class BoardStructure {
 		}
 	}
 
-	public bool checkMovable (Vector3 from, Vector3 to) { // checking if the movers own team goes into check from making the move
+	public BoardStructure (tileStruct [,] b) {
+		board = new tileStruct[8, 8];
+
+		whiteKing = new Vector2 ();
+		blackKing = new Vector2 ();
+
+
+		// initialize all the pseudo-tiles by what is at the original board at the given time
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+
+				board [i, j].team = b [i, j].team;
+				board [i, j].piece = b [i, j].piece;
+
+				if (board [i, j].piece == UnitType.KING && board[i,j].team == UnitTeam.WHITE)
+					whiteKing = new Vector2 (i, j);
+				if (board [i, j].piece == UnitType.KING && board[i,j].team == UnitTeam.BLACK)
+					blackKing = new Vector2 (i, j);
+			}
+		}
+	}
+
+	public int makeCall(tileStruct[,] b, Vector3 from, Vector3 to){
+		BoardStructure newB = new BoardStructure (b);
+		if(!newB.checkMovable (from, to))
+			return -200;
+		int val = 0;
+
+		// check if a unit is caputured, give 100 for queen, 50 for rook, bishop, knight and 20 for a pawn
+		// if no unit caputred 
+
+
+		return 0;
+	}
+
+
+	public int alphabeta(/*something, */int depth, int alpha, int beta, bool player){ // player, true for white, false for black
+		if(depth == 0)
+			return /*something*/;
+		int bestVal;
+		if (player) {
+			bestVal = int.MinValue;
+			for (int i = 0; i < 8; i++) {
+				for (int j = 0; j < 8; j++) {
+					if (board [i, j].team == UnitTeam.WHITE) {
+
+					}
+				}
+			}
+		} else {
+			bestVal = int.MaxValue;
+			for (int i = 0; i < 8; i++) {
+				for (int j = 0; j < 8; j++) {
+
+				}
+			}
+		}
+	}
+
+
+	public bool checkMovable (Vector3 from, Vector3 to) { // checking if move is valid or own team goes into check from making the move
 		bool moveable = true;
 		UnitTeam team = board [(int)from.x, (int)from.z].team; // team of the unit to be moved
 
