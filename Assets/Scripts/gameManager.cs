@@ -26,6 +26,8 @@ public class gameManager : MonoBehaviour {
 		gameReset = false;
 		GameObject.FindWithTag ("Finish").GetComponent<Text> ().text = "";
 		GameObject.Find ("CheckText").GetComponent<Text> ().text = "";
+
+		Debug.Log (PlayerPrefs.GetInt("AIGame"));
 	}
 
 	public int TurnColor {

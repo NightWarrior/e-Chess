@@ -22,6 +22,13 @@ public class White : MonoBehaviour {
 	public GameObject knight2;
 	public GameObject rook2;
 
+	public GameObject knightModel;
+	public GameObject bishopModel;
+	public GameObject rookModel;
+	public GameObject queenModel;
+
+	private UnitType[] pawnPromotions;
+
 	public float speed;
 
 	public bool castleRook1;
@@ -37,6 +44,11 @@ public class White : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		pawnPromotions = new UnitType[8];
+		for (int i = 0; i<8; i++) {
+			pawnPromotions[i] = UnitType.PAWN;
+		}
+
 		castleRook1 = true;
 		castleRook2 = true;
 		castleKing = true;
@@ -115,6 +127,7 @@ public class White : MonoBehaviour {
 				StartCoroutine (smoothMoveToLocationRoutine (new Vector3(pos.x-4, pos.y, pos.z), new Vector3(pos2.x+1, pos2.y, pos2.z), rook1));
 		}
 
+
 	}
 
 	IEnumerator smoothMoveToLocationRoutine(Vector3 pos1, Vector3 pos2, GameObject obj){
@@ -153,6 +166,24 @@ public class White : MonoBehaviour {
 		}
 
 		GameObject.Find ("Black").GetComponent<Black> ().disableInPassing ();
+
+
+		// Promotion
+		if(getUnitTypeAtPosition (pos2) == UnitType.PAWN && pos2.z==7){
+			StartCoroutine(promotionRoutine(pos2));
+		}
+	}
+
+	IEnumerator promotionRoutine(Vector3 pos2){
+		GameObject.Find ("Board").GetComponent<board> ().setPromotionType ("Null");
+		GameObject.Find ("Board").GetComponent<board> ().PromotionMenu.SetActive (true);
+		while(GameObject.Find ("Board").GetComponent<board> ().getPromotionType() == UnitType.NULL){
+			yield return null;
+		}
+		promotePawn (GameObject.Find ("Board").GetComponent<board> ().getPromotionType (), pos2);
+		GameObject.Find ("Board").GetComponent<board> ().PromotionMenu.SetActive (false);
+		GameObject.Find ("Board").GetComponent<board> ().setPromotionType ("Null");
+
 	}
 
 	public void disableInPassing(){
@@ -173,23 +204,120 @@ public class White : MonoBehaviour {
 		return false;
 	}
 
+	private GameObject getModelforType(UnitType u){
+		switch (u) {
+		case UnitType.BISHOP:
+			return bishopModel;
+		case UnitType.KNIGHT:
+			return knightModel;
+		case UnitType.ROOK:
+			return rookModel;
+		case UnitType.QUEEN:
+			return queenModel;
+		}
+		return null;
+	}
+
+	private float getModelHeightforType(UnitType u){
+		switch (u) {
+		case UnitType.BISHOP:
+			return 0.936F;
+		case UnitType.KNIGHT:
+			return 0.69F;
+		case UnitType.ROOK:
+			return 0.67F;
+		case UnitType.QUEEN:
+			return 0.96F;
+		}
+		return 0F;
+	}
+
+	private void promotePawn(UnitType u, Vector3 pos){
+		float xOffset = (u == UnitType.BISHOP ? -0.18F : 0F);
+		if (pawn1.transform.position.Equals (pos)) {
+			pawnPromotions [0] = u;
+			foreach(Transform child in pawn1.GetComponentInChildren<Transform>()){
+				GameObject.Destroy (child.gameObject);
+			}
+			GameObject model = Instantiate (getModelforType(u));
+			model.transform.parent = pawn1.transform;
+			model.transform.position = new Vector3(pawn1.transform.position.x+xOffset, pawn1.transform.position.y+getModelHeightforType(u), pawn1.transform.position.z);
+		} else if (pawn2.transform.position.Equals (pos)){
+			pawnPromotions[1] = u;
+			foreach(Transform child in pawn2.GetComponentInChildren<Transform>()){
+				GameObject.Destroy (child.gameObject);
+			}
+			GameObject model = Instantiate (getModelforType(u));
+			model.transform.parent = pawn2.transform;
+			model.transform.position = new Vector3(pawn2.transform.position.x+xOffset, pawn2.transform.position.y+getModelHeightforType(u), pawn2.transform.position.z);
+		} else if (pawn3.transform.position.Equals (pos)){
+			pawnPromotions[2] = u;
+			foreach(Transform child in pawn3.GetComponentInChildren<Transform>()){
+				GameObject.Destroy (child.gameObject);
+			}
+			GameObject model = Instantiate (getModelforType(u));
+			model.transform.parent = pawn3.transform;
+			model.transform.position = new Vector3(pawn3.transform.position.x+xOffset, pawn3.transform.position.y+getModelHeightforType(u), pawn3.transform.position.z);
+		} else if (pawn4.transform.position.Equals (pos)){
+			pawnPromotions[3] = u;
+			foreach(Transform child in pawn4.GetComponentInChildren<Transform>()){
+				GameObject.Destroy (child.gameObject);
+			}
+			GameObject model = Instantiate (getModelforType(u));
+			model.transform.parent = pawn4.transform;
+			model.transform.position = new Vector3(pawn4.transform.position.x+xOffset, pawn4.transform.position.y+getModelHeightforType(u), pawn4.transform.position.z);
+		} else if (pawn5.transform.position.Equals (pos)){
+			pawnPromotions[4] = u;
+			foreach(Transform child in pawn5.GetComponentInChildren<Transform>()){
+				GameObject.Destroy (child.gameObject);
+			}
+			GameObject model = Instantiate (getModelforType(u));
+			model.transform.parent = pawn5.transform;
+			model.transform.position = new Vector3(pawn5.transform.position.x+xOffset, pawn5.transform.position.y+getModelHeightforType(u), pawn5.transform.position.z);
+		} else if (pawn6.transform.position.Equals (pos)){
+			pawnPromotions[5] = u;
+			foreach(Transform child in pawn6.GetComponentInChildren<Transform>()){
+				GameObject.Destroy (child.gameObject);
+			}
+			GameObject model = Instantiate (getModelforType(u));
+			model.transform.parent = pawn6.transform;
+			model.transform.position = new Vector3(pawn6.transform.position.x+xOffset, pawn6.transform.position.y+getModelHeightforType(u), pawn6.transform.position.z);
+		} else if (pawn7.transform.position.Equals (pos)){
+			pawnPromotions[6] = u;
+			foreach(Transform child in pawn7.GetComponentInChildren<Transform>()){
+				GameObject.Destroy (child.gameObject);
+			}
+			GameObject model = Instantiate (getModelforType(u));
+			model.transform.parent = pawn7.transform;
+			model.transform.position = new Vector3(pawn7.transform.position.x+xOffset, pawn7.transform.position.y+getModelHeightforType(u), pawn7.transform.position.z);
+		} else if (pawn8.transform.position.Equals (pos)){
+			pawnPromotions[7] = u;
+			foreach(Transform child in pawn8.GetComponentInChildren<Transform>()){
+				GameObject.Destroy (child.gameObject);
+			}
+			GameObject model = Instantiate (getModelforType(u));
+			model.transform.parent = pawn8.transform;
+			model.transform.position = new Vector3(pawn8.transform.position.x+xOffset, pawn8.transform.position.y+getModelHeightforType(u), pawn8.transform.position.z);
+		}
+	}
+
 	public UnitType getUnitTypeAtPosition(Vector3 pos){
 		if (pawn1.transform.position.Equals (pos))
-			return UnitType.PAWN;
+			return pawnPromotions[0];
 		else if (pawn2.transform.position.Equals (pos))
-			return UnitType.PAWN;
+			return pawnPromotions[1];
 		else if (pawn3.transform.position.Equals (pos))
-			return UnitType.PAWN;
+			return pawnPromotions[2];
 		else if (pawn4.transform.position.Equals (pos))
-			return UnitType.PAWN;
+			return pawnPromotions[3];
 		else if (pawn5.transform.position.Equals (pos))
-			return UnitType.PAWN;
+			return pawnPromotions[4];
 		else if (pawn6.transform.position.Equals (pos))
-			return UnitType.PAWN;
+			return pawnPromotions[5];
 		else if (pawn7.transform.position.Equals (pos))
-			return UnitType.PAWN;
+			return pawnPromotions[6];
 		else if (pawn8.transform.position.Equals (pos))
-			return UnitType.PAWN;
+			return pawnPromotions[7];
 		else if (rook1.transform.position.Equals (pos))
 			return UnitType.ROOK;
 		else if (rook2.transform.position.Equals (pos))

@@ -180,7 +180,7 @@ public class BoardStructure {
 				if (board [(int)whiteKing.x + i, (int)whiteKing.y + i].team != UnitTeam.NULL) // if the path isnt clear then its skip the rest in that line
 					lineChecks [0] = false;
 			}
-			if (lineChecks [1] && (int)whiteKing.x + i < 8 && (int)whiteKing.y - i > 0) {
+			if (lineChecks [1] && (int)whiteKing.x + i < 8 && (int)whiteKing.y - i >= 0) {
 				if (board [(int)whiteKing.x + i, (int)whiteKing.y - i].team == UnitTeam.BLACK && board [(int)whiteKing.x + i, (int)whiteKing.y - i].piece == UnitType.BISHOP)
 					return true;
 				if (board [(int)whiteKing.x + i, (int)whiteKing.y - i].team == UnitTeam.BLACK && board [(int)whiteKing.x + i, (int)whiteKing.y - i].piece == UnitType.QUEEN)
@@ -189,7 +189,7 @@ public class BoardStructure {
 				if (board [(int)whiteKing.x + i, (int)whiteKing.y - i].team != UnitTeam.NULL)
 					lineChecks [1] = false;
 			}
-			if (lineChecks [2] && (int)whiteKing.x - i > 0 && (int)whiteKing.y + i < 8) {
+			if (lineChecks [2] && (int)whiteKing.x - i >= 0 && (int)whiteKing.y + i < 8) {
 				if (board [(int)whiteKing.x - i, (int)whiteKing.y + i].team == UnitTeam.BLACK && board [(int)whiteKing.x - i, (int)whiteKing.y + i].piece == UnitType.BISHOP)
 					return true;
 				if (board [(int)whiteKing.x - i, (int)whiteKing.y + i].team == UnitTeam.BLACK && board [(int)whiteKing.x - i, (int)whiteKing.y + i].piece == UnitType.QUEEN)
@@ -200,7 +200,7 @@ public class BoardStructure {
 				if (board [(int)whiteKing.x - i, (int)whiteKing.y + i].team != UnitTeam.NULL)
 					lineChecks [2] = false;
 			}
-			if (lineChecks [3] && (int)whiteKing.x - i > 0 && (int)whiteKing.y - i > 0) {
+			if (lineChecks [3] && (int)whiteKing.x - i >= 0 && (int)whiteKing.y - i >= 0) {
 				if (board [(int)whiteKing.x - i, (int)whiteKing.y - i].team == UnitTeam.BLACK && board [(int)whiteKing.x - i, (int)whiteKing.y - i].piece == UnitType.BISHOP)
 					return true;
 				if (board [(int)whiteKing.x - i, (int)whiteKing.y - i].team == UnitTeam.BLACK && board [(int)whiteKing.x - i, (int)whiteKing.y - i].piece == UnitType.QUEEN)
@@ -237,7 +237,7 @@ public class BoardStructure {
 						lineChecks [1] = false;
 				}
 			}
-			if ((int)whiteKing.x - i > 0) {
+			if ((int)whiteKing.x - i >= 0) {
 				if (lineChecks [2]) {
 					if (board [(int)whiteKing.x - i, (int)whiteKing.y].team == UnitTeam.BLACK && board [(int)whiteKing.x - i, (int)whiteKing.y].piece == UnitType.ROOK)
 						return true;
@@ -249,7 +249,7 @@ public class BoardStructure {
 				}
 
 			}
-			if ((int)whiteKing.y - i > 0) {
+			if ((int)whiteKing.y - i >= 0) {
 				if (lineChecks [3]) {
 					if (board [(int)whiteKing.x, (int)whiteKing.y - i].team == UnitTeam.BLACK && board [(int)whiteKing.x, (int)whiteKing.y - i].piece == UnitType.ROOK)
 						return true;
@@ -333,7 +333,7 @@ public class BoardStructure {
 				if (board [(int)blackKing.x + i, (int)blackKing.y + i].team != UnitTeam.NULL) // if the path isnt clear then its skip the rest in that line
 					lineChecks [0] = false;
 			}
-			if (lineChecks [1] && (int)blackKing.x + i < 8 && (int)blackKing.y - i > 0) {
+			if (lineChecks [1] && (int)blackKing.x + i < 8 && (int)blackKing.y - i >= 0) {
 				if (board [(int)blackKing.x + i, (int)blackKing.y - i].team == UnitTeam.WHITE && board [(int)blackKing.x + i, (int)blackKing.y - i].piece == UnitType.BISHOP)
 					return true;
 				if (board [(int)blackKing.x + i, (int)blackKing.y - i].team == UnitTeam.WHITE && board [(int)blackKing.x + i, (int)blackKing.y - i].piece == UnitType.QUEEN)
@@ -344,7 +344,7 @@ public class BoardStructure {
 				if (board [(int)blackKing.x + i, (int)blackKing.y - i].team != UnitTeam.NULL)
 					lineChecks [1] = false;
 			}
-			if (lineChecks [2] && (int)blackKing.x - i > 0 && (int)blackKing.y + i < 8) {
+			if (lineChecks [2] && (int)blackKing.x - i >= 0 && (int)blackKing.y + i < 8) {
 				if (board [(int)blackKing.x - i, (int)blackKing.y + i].team == UnitTeam.WHITE && board [(int)blackKing.x - i, (int)blackKing.y + i].piece == UnitType.BISHOP)
 					return true;
 				if (board [(int)blackKing.x - i, (int)blackKing.y + i].team == UnitTeam.WHITE && board [(int)blackKing.x - i, (int)blackKing.y + i].piece == UnitType.QUEEN)
@@ -353,7 +353,7 @@ public class BoardStructure {
 				if (board [(int)blackKing.x - i, (int)blackKing.y + i].team != UnitTeam.NULL)
 					lineChecks [2] = false;
 			}
-			if (lineChecks [3] && (int)blackKing.x - i > 0 && (int)blackKing.y - i > 0) {
+			if (lineChecks [3] && (int)blackKing.x - i >= 0 && (int)blackKing.y - i >= 0) {
 				if (board [(int)blackKing.x - i, (int)blackKing.y - i].team == UnitTeam.WHITE && board [(int)blackKing.x - i, (int)blackKing.y - i].piece == UnitType.BISHOP)
 					return true;
 				if (board [(int)blackKing.x - i, (int)blackKing.y - i].team == UnitTeam.WHITE && board [(int)blackKing.x - i, (int)blackKing.y - i].piece == UnitType.QUEEN)
@@ -393,7 +393,7 @@ public class BoardStructure {
 						lineChecks [1] = false;
 				}
 			}
-			if ((int)blackKing.x - i > 0) {
+			if ((int)blackKing.x - i >= 0) {
 				if (lineChecks [2]) {
 					if (board [(int)blackKing.x - i, (int)blackKing.y].team == UnitTeam.WHITE && board [(int)blackKing.x - i, (int)blackKing.y].piece == UnitType.ROOK)
 						return true;
@@ -404,7 +404,7 @@ public class BoardStructure {
 						lineChecks [2] = false;
 				}
 			}
-			if ((int)blackKing.y - i > 0) {
+			if ((int)blackKing.y - i >= 0) {
 				if (lineChecks [3]) {
 					if (board [(int)blackKing.x, (int)blackKing.y - i].team == UnitTeam.WHITE && board [(int)blackKing.x, (int)blackKing.y - i].piece == UnitType.ROOK)
 						return true;

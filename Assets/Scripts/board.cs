@@ -4,7 +4,7 @@ using UnityEngine;
 
 
 public enum UnitType {
-PAWN,
+	PAWN,
 	ROOK,
 	KNIGHT,
 	BISHOP,
@@ -15,12 +15,24 @@ PAWN,
 
 public class board : MonoBehaviour {
 
+	private GameObject[] highlights;
 
 	public GameObject[,] rows = new GameObject[8, 8];
-	private GameObject[] highlights;
-	private int highlightCount;
 	public GameObject highlight;
+	public GameObject promotionMenu;
 
+	UnitType promotionType;
+
+	private int highlightCount;
+
+	public GameObject PromotionMenu {
+		get {
+			return promotionMenu;
+		}
+		set {
+			promotionMenu = value;
+		}
+	}
 
 	// turnColor is used to keep a hold on which player's turn is it, 0 for black and 1 for white
 
@@ -36,6 +48,8 @@ public class board : MonoBehaviour {
 			}
 		}
 
+		promotionMenu.SetActive (false);
+			
 
 	}
 	
@@ -132,6 +146,23 @@ public class board : MonoBehaviour {
 			return true;
 		}
 		return false;
+	}
+
+	public UnitType getPromotionType(){
+		return promotionType;
+	}
+
+	public void setPromotionType(string type){
+		if (type == "Queen")
+			promotionType = UnitType.QUEEN;
+		else if (type == "Rook")
+			promotionType = UnitType.ROOK;
+		else if (type == "Bishop")
+			promotionType = UnitType.BISHOP;
+		else if (type == "Knight")
+			promotionType = UnitType.KNIGHT;
+		if (type == "Null")
+			promotionType = UnitType.NULL;
 	}
 
 	public void highLightMoveLocations (UnitType unitType, Vector3 pos, int face) {
