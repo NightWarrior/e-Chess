@@ -1,0 +1,55 @@
+Initialize engine version: 5.5.1f1 (88d00a7498cd)
+GfxDevice: creating device client; threaded=1
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.0]
+    Renderer: NVIDIA GeForce GT 740 (ID=0xfc8)
+    Vendor:   NVIDIA
+    VRAM:     994 MB
+    Driver:   21.21.13.7653
+Begin MonoManager ReloadAssembly
+Platform assembly: E:\Ebooks\QAU\Semester 8\Final Year Project\e-Chess\e-Chess_Data\Managed\UnityEngine.dll (this message is harmless)
+Loading E:\Ebooks\QAU\Semester 8\Final Year Project\e-Chess\e-Chess_Data\Managed\UnityEngine.dll into Unity Child Domain
+Platform assembly: E:\Ebooks\QAU\Semester 8\Final Year Project\e-Chess\e-Chess_Data\Managed\Assembly-CSharp.dll (this message is harmless)
+Loading E:\Ebooks\QAU\Semester 8\Final Year Project\e-Chess\e-Chess_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
+Platform assembly: E:\Ebooks\QAU\Semester 8\Final Year Project\e-Chess\e-Chess_Data\Managed\UnityEngine.UI.dll (this message is harmless)
+Loading E:\Ebooks\QAU\Semester 8\Final Year Project\e-Chess\e-Chess_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
+Platform assembly: E:\Ebooks\QAU\Semester 8\Final Year Project\e-Chess\e-Chess_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
+Loading E:\Ebooks\QAU\Semester 8\Final Year Project\e-Chess\e-Chess_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
+Platform assembly: E:\Ebooks\QAU\Semester 8\Final Year Project\e-Chess\e-Chess_Data\Managed\UnityEngine.PlaymodeTestsRunner.dll (this message is harmless)
+Loading E:\Ebooks\QAU\Semester 8\Final Year Project\e-Chess\e-Chess_Data\Managed\UnityEngine.PlaymodeTestsRunner.dll into Unity Child Domain
+Platform assembly: E:\Ebooks\QAU\Semester 8\Final Year Project\e-Chess\e-Chess_Data\Managed\UnityEngine.Analytics.dll (this message is harmless)
+Loading E:\Ebooks\QAU\Semester 8\Final Year Project\e-Chess\e-Chess_Data\Managed\UnityEngine.Analytics.dll into Unity Child Domain
+- Completed reload, in  0.219 seconds
+Platform assembly: E:\Ebooks\QAU\Semester 8\Final Year Project\e-Chess\e-Chess_Data\Managed\System.Core.dll (this message is harmless)
+Platform assembly: E:\Ebooks\QAU\Semester 8\Final Year Project\e-Chess\e-Chess_Data\Managed\System.dll (this message is harmless)
+desktop: 1680x1050 59Hz; virtual: 1680x1050 at 0,0
+<RI> Initializing input.
+<RI> Input initialized.
+<RI> Initialized touch support.
+UnloadTime: 1.651477 ms
+Setting up 1 worker threads for Enlighten.
+  Thread -> id: 2160 -> priority: 1 
+Unloading 4 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 6.401012 ms
+
+Unloading 2 unused Assets to reduce memory usage. Loaded Objects now: 1133.
+Total: 0.368361 ms (FindLiveObjects: 0.080275 ms CreateObjectMapping: 0.036577 ms MarkObjects: 0.215578 ms  DeleteObjects: 0.005502 ms)
+
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 1.218377 ms
+
+Unloading 1 unused Assets to reduce memory usage. Loaded Objects now: 1133.
+Total: 0.384546 ms (FindLiveObjects: 0.081894 ms CreateObjectMapping: 0.025247 ms MarkObjects: 0.269311 ms  DeleteObjects: 0.007121 ms)
+
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.926083 ms
+
+Unloading 1 unused Assets to reduce memory usage. Loaded Objects now: 1133.
+Total: 0.351205 ms (FindLiveObjects: 0.088367 ms CreateObjectMapping: 0.027513 ms MarkObjects: 0.227879 ms  DeleteObjects: 0.006150 ms)
+
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 1.148459 ms
+
+Unloading 1 unused Assets to reduce memory usage. Loaded Objects now: 1133.
+Total: 0.408175 ms (FindLiveObjects: 0.106818 ms CreateObjectMapping: 0.053409 ms MarkObjects: 0.240826 ms  DeleteObjects: 0.005826 ms)
+

@@ -24,13 +24,37 @@ public class White : MonoBehaviour {
 
 	public float speed;
 
+	public bool castleRook1;
+	public bool castleRook2;
+	public bool castleKing;
+
 
 	Vector3 trash = new Vector3(-5, 0, -5);
 
 
 	// Use this for initialization
 	void Start () {
-		
+		castleRook1 = true;
+		castleRook2 = true;
+		castleKing = true;
+	}
+
+	public void hasCastled(){
+		castleRook1 = false;
+		castleRook2 = false;
+		castleKing = false;
+	}
+
+	public bool canCastle(){
+		return castleKing && (castleRook1 || castleRook2);
+	}
+
+	public bool canCastleRook1(){
+		return castleRook1;
+	}
+
+	public bool canCastleRook2(){
+		return castleRook2;
 	}
 	
 	// Update is called once per frame
@@ -57,13 +81,15 @@ public class White : MonoBehaviour {
 			StartCoroutine (smoothMoveToLocationRoutine (pos, pos2, pawn7));
 		else if (pawn8.transform.position.Equals (pos))
 			StartCoroutine (smoothMoveToLocationRoutine (pos, pos2, pawn8));
-		else if (rook1.transform.position.Equals (pos))
+		else if (rook1.transform.position.Equals (pos)) {
+			if (canCastleRook1 ()) castleRook1 = false;
 			StartCoroutine (smoothMoveToLocationRoutine (pos, pos2, rook1));
-		else if (rook2.transform.position.Equals (pos))
+		} else if (rook2.transform.position.Equals (pos)) {
+			if (canCastleRook2 ()) castleRook2 = false;
 			StartCoroutine (smoothMoveToLocationRoutine (pos, pos2, rook2));
-		else if (knight1.transform.position.Equals (pos))
+		} else if (knight1.transform.position.Equals (pos)) 
 			StartCoroutine (smoothMoveToLocationRoutine (pos, pos2, knight1));
-		else if (knight2.transform.position.Equals (pos))
+		else if (knight2.transform.position.Equals (pos)) 
 			StartCoroutine (smoothMoveToLocationRoutine (pos, pos2, knight2));
 		else if (bishop1.transform.position.Equals (pos))
 			StartCoroutine (smoothMoveToLocationRoutine (pos, pos2, bishop1));
@@ -71,8 +97,18 @@ public class White : MonoBehaviour {
 			StartCoroutine (smoothMoveToLocationRoutine (pos, pos2, bishop2));
 		else if (queen.transform.position.Equals (pos))
 			StartCoroutine (smoothMoveToLocationRoutine (pos, pos2, queen));
-		else if (king.transform.position.Equals (pos))
+		else if (king.transform.position.Equals (pos)) {
+			if (canCastle ())
+				hasCastled ();
 			StartCoroutine (smoothMoveToLocationRoutine (pos, pos2, king));
+
+			// check if its a castling move
+			if(pos.x+2 == pos2.x)
+				StartCoroutine (smoothMoveToLocationRoutine (new Vector3(pos.x+3, pos.y, pos.z), new Vector3(pos2.x-1, pos2.y, pos2.z), rook2));
+
+			if(pos.x-2 == pos2.x)
+				StartCoroutine (smoothMoveToLocationRoutine (new Vector3(pos.x-4, pos.y, pos.z), new Vector3(pos2.x+1, pos2.y, pos2.z), rook1));
+		}
 
 	}
 

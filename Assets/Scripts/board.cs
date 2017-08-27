@@ -81,9 +81,23 @@ public class board : MonoBehaviour {
 		if (pos.x < 0 || pos.x > 7 || pos.z < 0 || pos.z > 7)
 			return false;
 		if (GameObject.Find ("White").GetComponent<White> ().getUnitTypeAtPosition (pos) == UnitType.NULL// checking if the area is free
-		    && GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (pos) == UnitType.NULL)
+			&& GameObject.Find ("Black").GetComponent<Black> ().getUnitTypeAtPosition (pos) == UnitType.NULL)
 			return true;
 		return false;
+	}
+
+	bool checkPathFreeHorizontal (Vector3 pos1, Vector3 pos2) { // checks if a horizontal path is clear or not, both indexes inclusive
+		if(pos1.z != pos2.z || pos1.y != pos2.y) return false;
+
+		bool free = true;
+		for (int i = (int)pos1.x; i <= (int)pos2.x; i++) {
+			if (!checkTileFree (new Vector3 (i, pos1.y, pos1.z))) {
+				free = false;
+				break;
+			}
+		}
+		//Debug.Log ("check path '"+pos1 +"', '"+pos2 +"' returned: " + free);
+		return free;
 	}
 
 
@@ -736,6 +750,25 @@ public class board : MonoBehaviour {
 				highlightList.Add (Instantiate (highlight, new Vector3 (pos.x, pos.y, pos.z + 1 * face), Quaternion.identity));
 				highlightCount++;
 			}
+
+			// Checking Castling  /////////////////////////////////////
+			if (checkPathFreeHorizontal(new Vector3(pos.x+1, pos.y, pos.z), new Vector3(pos.x+2, pos.y, pos.z)) && (face==1 ? 
+				GameObject.Find ("White").GetComponent<White> ().canCastle() : GameObject.Find ("Black").GetComponent<Black> ().canCastle())) { // if face is 1, check for white, else black
+				if((face==1 ? 
+					GameObject.Find ("White").GetComponent<White> ().canCastleRook1() : GameObject.Find ("Black").GetComponent<Black> ().canCastleRook2())){
+					highlightList.Add (Instantiate (highlight, new Vector3 (pos.x+2, pos.y, pos.z), Quaternion.identity));
+					highlightCount++;
+				}
+			}
+			if (checkPathFreeHorizontal(new Vector3(pos.x-3, pos.y, pos.z), new Vector3(pos.x-1, pos.y, pos.z)) && (face==1 ? 
+				GameObject.Find ("White").GetComponent<White> ().canCastle() : GameObject.Find ("Black").GetComponent<Black> ().canCastle())) {
+				if((face==1 ? 
+					GameObject.Find ("White").GetComponent<White> ().canCastleRook2() : GameObject.Find ("Black").GetComponent<Black> ().canCastleRook1())){
+					highlightList.Add (Instantiate (highlight, new Vector3 (pos.x-2, pos.y, pos.z), Quaternion.identity));
+					highlightCount++;
+				}
+			}
+
 
 			if (face == 1) {
 				// Check capture moves
