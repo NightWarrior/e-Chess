@@ -77,27 +77,586 @@ public class BoardStructure {
 			return -200;
 		int val = 0;
 
-		// check if a unit is caputured, give 100 for queen, 50 for rook, bishop, knight and 20 for a pawn
-		// if no unit caputred 
+		UnitTeam team = newB.board [(int)from.x, (int)from.z].team; // team of the unit to be moved
+		UnitType targetUnit = newB.board [(int)to.x, (int)to.z].piece; // to check if there is an enemy unit at the other end
 
 
-		return 0;
+		newB.move (from, to);
+		if (team == UnitTeam.BLACK) {// checking if opponent is in check
+			if (newB.isWhiteCheck ()) {
+				val += 200;
+			}
+		} else
+			if(newB.isBlackCheck ()) {
+			val += 200;
+		}
+
+		if (targetUnit == UnitType.QUEEN)
+			val += 100;
+		else if (targetUnit == UnitType.PAWN)
+			val += 20;
+		else if (targetUnit == UnitType.ROOK || targetUnit == UnitType.BISHOP || targetUnit == UnitType.KNIGHT)
+			val += 50;
+		
+
+
+		return val;
+	}
+
+	public tileStruct[,] getBoardAfterMove(tileStruct[,] b, Vector3 from, Vector3 to){
+		BoardStructure newB = new BoardStructure (b);
+		newB.move (from, to);
+		return newB.board; // Note: Might Cause error if its held in reffence and unallocated when needed.
+
 	}
 
 
-	public int alphabeta(/*something, */int depth, int alpha, int beta, bool player){ // player, true for white, false for black
+	public int alphabeta(int nodeVal, int depth, int alpha, int beta, bool player, tileStruct[,] b){ // player, true for white, false for black
 		if(depth == 0)
-			return /*something*/;
+			return nodeVal;
 		int bestVal;
+		int highlights = 0; // if highlights are still 0 at the end, means enemy has done checkmate, reurn a -1000
 		if (player) {
 			bestVal = int.MinValue;
 			for (int i = 0; i < 8; i++) {
 				for (int j = 0; j < 8; j++) {
+					UnitType unitType = board [i, j].piece;
 					if (board [i, j].team == UnitTeam.WHITE) {
+						if (board [i, j].piece == UnitType.PAWN) {
+							if (j == 1) { // 1 for white
+								// Check if pawn is at initial stage and can move two steps
+								if (board [i, j + 1].piece == UnitType.NULL) {
+									highlights++;
+									int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i, 0, j + 1));
+									if (newVal != -200)
+										newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i, 0, j + 1)));
+									bestVal = Mathf.Max (newVal, bestVal);
+									alpha = Mathf.Max (alpha, bestVal);
+									if (beta <= alpha)
+										return bestVal;
 
+
+									if (board [i, j + 2].piece == UnitType.NULL) {
+										highlights++;
+										newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i, 0, j + 2));
+										if (newVal != -200)
+											newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i, 0, j + 2)));
+										bestVal = Mathf.Max (newVal, bestVal);
+										alpha = Mathf.Max (alpha, bestVal);
+										if (beta <= alpha)
+											return bestVal;
+									}
+								}
+							} else {
+								// Check rest of the times
+								if (board [i, j + 1].piece == UnitType.NULL) {
+									highlights++;
+									int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i, 0, j + 1));
+									if (newVal != -200)
+										newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i, 0, j + 1)));
+									bestVal = Mathf.Max (newVal, bestVal);
+									alpha = Mathf.Max (alpha, bestVal);
+									if (beta <= alpha)
+										return bestVal;
+								}
+							}
+
+							if (board [i + 1, j + 1].team == UnitTeam.BLACK && board [i + 1, j + 1].piece != UnitType.KING) {
+								if (board [i + 1, j + 1].piece == UnitType.NULL) {
+									highlights++;
+									int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i + 1, 0, j + 1));
+									if (newVal != -200)
+										newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i + 1, 0, j + 1)));
+									bestVal = Mathf.Max (newVal, bestVal);
+									alpha = Mathf.Max (alpha, bestVal);
+									if (beta <= alpha)
+										return bestVal;
+
+								}
+							}
+							if (board [i - 1, j + 1].team == UnitTeam.BLACK && board [i - 1, j + 1].piece != UnitType.KING) {
+								if (board [i - 1, j + 1].piece == UnitType.NULL) {
+									highlights++;
+									int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i - 1, 0, j + 1));
+									if (newVal != -200)
+										newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i - 1, 0, j + 1)));
+									bestVal = Mathf.Max (newVal, bestVal);
+									alpha = Mathf.Max (alpha, bestVal);
+									if (beta <= alpha)
+										return bestVal;
+								}
+							}
+						} else if (board [i, j].piece == UnitType.KING) { ////////////////////////////////////////////////////////////////////////////////
+							if (board [i, j + 1].piece == UnitType.NULL) {
+								highlights++;
+								int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i, 0, j + 1));
+								if (newVal != -200)
+									newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i, 0, j + 1)));
+								bestVal = Mathf.Max (newVal, bestVal);
+								alpha = Mathf.Max (alpha, bestVal);
+								if (beta <= alpha)
+									return bestVal;
+							}
+
+							if (board [i + 1, j + 1].piece == UnitType.NULL) {
+								highlights++;
+								int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i + 1, 0, j + 1));
+								if (newVal != -200)
+									newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i + 1, 0, j + 1)));
+								bestVal = Mathf.Max (newVal, bestVal);
+								alpha = Mathf.Max (alpha, bestVal);
+								if (beta <= alpha)
+									return bestVal;
+							}
+
+							if (board [i + 1, j].piece == UnitType.NULL) {
+								highlights++;
+								int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i + 1, 0, j));
+								if (newVal != -200)
+									newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i + 1, 0, j)));
+								bestVal = Mathf.Max (newVal, bestVal);
+								alpha = Mathf.Max (alpha, bestVal);
+								if (beta <= alpha)
+									return bestVal;
+							}
+
+							if (board [i + 1, j - 1].piece == UnitType.NULL) {
+								highlights++;
+								int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i + 1, 0, j - 1));
+								if (newVal != -200)
+									newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i + 1, 0, j - 1)));
+								bestVal = Mathf.Max (newVal, bestVal);
+								alpha = Mathf.Max (alpha, bestVal);
+								if (beta <= alpha)
+									return bestVal;
+							}
+
+							if (board [i, j - 1].piece == UnitType.NULL) {
+								highlights++;
+								int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i, 0, j - 1));
+								if (newVal != -200)
+									newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i, 0, j - 1)));
+								bestVal = Mathf.Max (newVal, bestVal);
+								alpha = Mathf.Max (alpha, bestVal);
+								if (beta <= alpha)
+									return bestVal;
+							}
+
+							if (board [i - 1, j - 1].piece == UnitType.NULL) {
+								highlights++;
+								int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i - 1, 0, j - 1));
+								if (newVal != -200)
+									newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i - 1, 0, j - 1)));
+								bestVal = Mathf.Max (newVal, bestVal);
+								alpha = Mathf.Max (alpha, bestVal);
+								if (beta <= alpha)
+									return bestVal;
+							}
+
+							if (board [i - 1, j].piece == UnitType.NULL) {
+								highlights++;
+								int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i - 1, 0, j));
+								if (newVal != -200)
+									newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i - 1, 0, j)));
+								bestVal = Mathf.Max (newVal, bestVal);
+								alpha = Mathf.Max (alpha, bestVal);
+								if (beta <= alpha)
+									return bestVal;
+							}
+
+							if (board [i - 1, j + 1].piece == UnitType.NULL) {
+								highlights++;
+								int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i - 1, 0, j + 1));
+								if (newVal != -200)
+									newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i - 1, 0, j + 1)));
+								bestVal = Mathf.Max (newVal, bestVal);
+								alpha = Mathf.Max (alpha, bestVal);
+								if (beta <= alpha)
+									return bestVal;
+							}
+							//king attacks: 
+
+						
+							if (board [i, j + 1].team == UnitTeam.BLACK && board [i, j + 1].piece != UnitType.KING) {
+								if (board [i, j + 1].piece == UnitType.NULL) {
+									highlights++;
+									int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i, 0, j + 1));
+									if (newVal != -200)
+										newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i, 0, j + 1)));
+									bestVal = Mathf.Max (newVal, bestVal);
+									alpha = Mathf.Max (alpha, bestVal);
+									if (beta <= alpha)
+										return bestVal;
+								}
+
+							}
+							if (board [i + 1, j + 1].team == UnitTeam.BLACK && board [i + 1, j + 1].piece != UnitType.KING) {
+								if (board [i + 1, j + 1].piece == UnitType.NULL) {
+									highlights++;
+									int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i + 1, 0, j + 1));
+									if (newVal != -200)
+										newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i + 1, 0, j + 1)));
+									bestVal = Mathf.Max (newVal, bestVal);
+									alpha = Mathf.Max (alpha, bestVal);
+									if (beta <= alpha)
+										return bestVal;
+								}
+
+							}
+							if (board [i + 1, j].team == UnitTeam.BLACK && board [i + 1, j].piece != UnitType.KING) {
+								if (board [i + 1, j].piece == UnitType.NULL) {
+									highlights++;
+									int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i + 1, 0, j));
+									if (newVal != -200)
+										newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i + 1, 0, j)));
+									bestVal = Mathf.Max (newVal, bestVal);
+									alpha = Mathf.Max (alpha, bestVal);
+									if (beta <= alpha)
+										return bestVal;
+								}
+
+							}
+							if (board [i + 1, j - 1].team == UnitTeam.BLACK && board [i + 1, j - 1].piece != UnitType.KING) {
+								if (board [i + 1, j - 1].piece == UnitType.NULL) {
+									highlights++;
+									int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i + 1, 0, j - 1));
+									if (newVal != -200)
+										newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i + 1, 0, j - 1)));
+									bestVal = Mathf.Max (newVal, bestVal);
+									alpha = Mathf.Max (alpha, bestVal);
+									if (beta <= alpha)
+										return bestVal;
+								}
+
+							}
+							if (board [i, j - 1].team == UnitTeam.BLACK && board [i, j - 1].piece != UnitType.KING) {
+								if (board [i, j - 1].piece == UnitType.NULL) {
+									highlights++;
+									int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i, 0, j - 1));
+									if (newVal != -200)
+										newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i, 0, j - 1)));
+									bestVal = Mathf.Max (newVal, bestVal);
+									alpha = Mathf.Max (alpha, bestVal);
+									if (beta <= alpha)
+										return bestVal;
+								}
+
+							}
+							if (board [i - 1, j - 1].team == UnitTeam.BLACK && board [i - 1, j - 1].piece != UnitType.KING) {
+								if (board [i - 1, j - 1].piece == UnitType.NULL) {
+									highlights++;
+									int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i - 1, 0, j - 1));
+									if (newVal != -200)
+										newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i - 1, 0, j - 1)));
+									bestVal = Mathf.Max (newVal, bestVal);
+									alpha = Mathf.Max (alpha, bestVal);
+									if (beta <= alpha)
+										return bestVal;
+								}
+
+							}
+							if (board [i - 1, j].team == UnitTeam.BLACK && board [i - 1, j].piece != UnitType.KING) {
+								if (board [i - 1, j].piece == UnitType.NULL) {
+									highlights++;
+									int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i - 1, 0, j));
+									if (newVal != -200)
+										newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i - 1, 0, j)));
+									bestVal = Mathf.Max (newVal, bestVal);
+									alpha = Mathf.Max (alpha, bestVal);
+									if (beta <= alpha)
+										return bestVal;
+								}
+
+							}
+							if (board [i - 1, j + 1].team == UnitTeam.BLACK && board [i - 1, j + 1].piece != UnitType.KING) {
+								if (board [i - 1, j + 1].piece == UnitType.NULL) {
+									highlights++;
+									int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i - 1, 0, j + 1));
+									if (newVal != -200)
+										newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i - 1, 0, j + 1)));
+									bestVal = Mathf.Max (newVal, bestVal);
+									alpha = Mathf.Max (alpha, bestVal);
+									if (beta <= alpha)
+										return bestVal;
+								}
+							}
+						
+						} else if (board [i, j].piece == UnitType.KNIGHT) {////////////////////////////////////////////////////////////////////////////////
+							if (board [i + 1, j + 2].piece == UnitType.NULL) {
+								highlights++;
+								int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i + 1, 0, j + 2));
+								if (newVal != -200)
+									newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i + 1, 0, j + 2)));
+								bestVal = Mathf.Max (newVal, bestVal);
+								alpha = Mathf.Max (alpha, bestVal);
+								if (beta <= alpha)
+									return bestVal;
+							}
+
+							if (board [i + 2, j + 1].piece == UnitType.NULL) {
+								highlights++;
+								int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i + 2, 0, j + 1));
+								if (newVal != -200)
+									newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i + 2, 0, j + 1)));
+								bestVal = Mathf.Max (newVal, bestVal);
+								alpha = Mathf.Max (alpha, bestVal);
+								if (beta <= alpha)
+									return bestVal;
+							}
+
+							if (board [i + 1, j - 2].piece == UnitType.NULL) {
+								highlights++;
+								int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i + 1, 0, j - 2));
+								if (newVal != -200)
+									newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i + 1, 0, j - 2)));
+								bestVal = Mathf.Max (newVal, bestVal);
+								alpha = Mathf.Max (alpha, bestVal);
+								if (beta <= alpha)
+									return bestVal;
+							}
+
+							if (board [i + 2, j - 1].piece == UnitType.NULL) {
+								highlights++;
+								int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i + 2, 0, j - 1));
+								if (newVal != -200)
+									newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i + 2, 0, j - 1)));
+								bestVal = Mathf.Max (newVal, bestVal);
+								alpha = Mathf.Max (alpha, bestVal);
+								if (beta <= alpha)
+									return bestVal;
+							}
+
+							if (board [i - 1, j - 2].piece == UnitType.NULL) {
+								highlights++;
+								int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i - 1, 0, j - 2));
+								if (newVal != -200)
+									newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i - 1, 0, j - 2)));
+								bestVal = Mathf.Max (newVal, bestVal);
+								alpha = Mathf.Max (alpha, bestVal);
+								if (beta <= alpha)
+									return bestVal;
+							}
+
+							if (board [i - 2, j - 1].piece == UnitType.NULL) {
+								highlights++;
+								int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i - 2, 0, j - 1));
+								if (newVal != -200)
+									newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i - 2, 0, j - 1)));
+								bestVal = Mathf.Max (newVal, bestVal);
+								alpha = Mathf.Max (alpha, bestVal);
+								if (beta <= alpha)
+									return bestVal;
+							}
+
+							if (board [i - 1, j + 2].piece == UnitType.NULL) {
+								highlights++;
+								int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i - 1, 0, j + 2));
+								if (newVal != -200)
+									newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i - 1, 0, j + 2)));
+								bestVal = Mathf.Max (newVal, bestVal);
+								alpha = Mathf.Max (alpha, bestVal);
+								if (beta <= alpha)
+									return bestVal;
+							}
+
+							if (board [i - 2, j + 1].piece == UnitType.NULL) {
+								highlights++;
+								int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i - 2, 0, j + 1));
+								if (newVal != -200)
+									newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i - 2, 0, j + 1)));
+								bestVal = Mathf.Max (newVal, bestVal);
+								alpha = Mathf.Max (alpha, bestVal);
+								if (beta <= alpha)
+									return bestVal;
+							}
+							//Knight attacks: 
+
+
+							if (board [i, j + 1].team == UnitTeam.BLACK && board [i, j + 1].piece != UnitType.KING) {
+								if (board [i + 1, j + 2].piece == UnitType.NULL) {
+									highlights++;
+									int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i + 1, 0, j + 2));
+									if (newVal != -200)
+										newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i + 1, 0, j + 2)));
+									bestVal = Mathf.Max (newVal, bestVal);
+									alpha = Mathf.Max (alpha, bestVal);
+									if (beta <= alpha)
+										return bestVal;
+								}
+
+							}
+							if (board [i + 2, j + 1].team == UnitTeam.BLACK && board [i + 2, j + 1].piece != UnitType.KING) {
+								if (board [i + 2, j + 1].piece == UnitType.NULL) {
+									highlights++;
+									int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i + 2, 0, j + 1));
+									if (newVal != -200)
+										newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i + 2, 0, j + 1)));
+									bestVal = Mathf.Max (newVal, bestVal);
+									alpha = Mathf.Max (alpha, bestVal);
+									if (beta <= alpha)
+										return bestVal;
+								}
+
+							}
+							if (board [i + 1, j - 2].team == UnitTeam.BLACK && board [i + 1, j - 2].piece != UnitType.KING) {
+								if (board [i + 1, j - 2].piece == UnitType.NULL) {
+									highlights++;
+									int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i + 1, 0, j - 2));
+									if (newVal != -200)
+										newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i + 1, 0, j - 2)));
+									bestVal = Mathf.Max (newVal, bestVal);
+									alpha = Mathf.Max (alpha, bestVal);
+									if (beta <= alpha)
+										return bestVal;
+								}
+
+							}
+							if (board [i + 2, j - 1].team == UnitTeam.BLACK && board [i + 2, j - 1].piece != UnitType.KING) {
+								if (board [i + 2, j - 1].piece == UnitType.NULL) {
+									highlights++;
+									int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i + 2, 0, j - 1));
+									if (newVal != -200)
+										newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i + 2, 0, j - 1)));
+									bestVal = Mathf.Max (newVal, bestVal);
+									alpha = Mathf.Max (alpha, bestVal);
+									if (beta <= alpha)
+										return bestVal;
+								}
+
+							}
+							if (board [i - 1, j - 2].team == UnitTeam.BLACK && board [i - 1, j - 2].piece != UnitType.KING) {
+								if (board [i - 1, j - 2].piece == UnitType.NULL) {
+									highlights++;
+									int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i - 1, 0, j - 2));
+									if (newVal != -200)
+										newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i - 1, 0, j - 2)));
+									bestVal = Mathf.Max (newVal, bestVal);
+									alpha = Mathf.Max (alpha, bestVal);
+									if (beta <= alpha)
+										return bestVal;
+								}
+
+							}
+							if (board [i - 2, j - 1].team == UnitTeam.BLACK && board [i - 2, j - 1].piece != UnitType.KING) {
+								if (board [i - 2, j - 1].piece == UnitType.NULL) {
+									highlights++;
+									int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i - 2, 0, j - 1));
+									if (newVal != -200)
+										newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i - 2, 0, j - 1)));
+									bestVal = Mathf.Max (newVal, bestVal);
+									alpha = Mathf.Max (alpha, bestVal);
+									if (beta <= alpha)
+										return bestVal;
+								}
+
+							}
+							if (board [i - 1, j + 2].team == UnitTeam.BLACK && board [i - 1, j + 2].piece != UnitType.KING) {
+								if (board [i - 1, j + 2].piece == UnitType.NULL) {
+									highlights++;
+									int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i - 1, 0, j + 2));
+									if (newVal != -200)
+										newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i - 1, 0, j + 2)));
+									bestVal = Mathf.Max (newVal, bestVal);
+									alpha = Mathf.Max (alpha, bestVal);
+									if (beta <= alpha)
+										return bestVal;
+								}
+
+							}
+							if (board [i - 2, j + 1].team == UnitTeam.BLACK && board [i - 2, j + 1].piece != UnitType.KING) {
+								if (board [i - 2, j + 1].piece == UnitType.NULL) {
+									highlights++;
+									int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i - 2, 0, j + 1));
+									if (newVal != -200)
+										newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i - 2, 0, j + 1)));
+									bestVal = Mathf.Max (newVal, bestVal);
+									alpha = Mathf.Max (alpha, bestVal);
+									if (beta <= alpha)
+										return bestVal;
+								}
+							}
+						}
+						else if (board [i, j].piece == UnitType.ROOK) {////////////////////////////////////////////////////////////////////////////////
+							bool breaker = false;
+							for (int k = 0; k < 8; k++) {
+								if (breaker == true)
+									break;
+
+								if (board [i + k, j ].piece == UnitType.NULL) {
+									highlights++;
+									int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i + k, 0, j ));
+									if (newVal != -200)
+										newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i  + k, 0, j )));
+									bestVal = Mathf.Max (newVal, bestVal);
+									alpha = Mathf.Max (alpha, bestVal);
+									if (beta <= alpha)
+										return bestVal;
+								}
+
+								if (board [i + k, j ].team == UnitTeam.BLACK && board [i + k, j ].piece != UnitType.KING) {
+									if (board [i + k, j ].piece == UnitType.NULL) {
+										highlights++;
+										int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i + k, 0, j ));
+										if (newVal != -200)
+											newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i  + k, 0, j )));
+										bestVal = Mathf.Max (newVal, bestVal);
+										alpha = Mathf.Max (alpha, bestVal);
+										if (beta <= alpha)
+											return bestVal;
+									}
+									breaker = true;
+									break;
+								}
+							}
+
+
+							breaker = false; ////// change the directional values //////////////////////////////////////////////////////////////////////////////////////////
+							for (int k = 0; k < 8; k++) {
+								if (breaker == true)
+									break;
+
+								if (board [i + k, j ].piece == UnitType.NULL) {
+									highlights++;
+									int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i + k, 0, j ));
+									if (newVal != -200)
+										newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i  + k, 0, j )));
+									bestVal = Mathf.Max (newVal, bestVal);
+									alpha = Mathf.Max (alpha, bestVal);
+									if (beta <= alpha)
+										return bestVal;
+								}
+
+								if (board [i + k, j ].team == UnitTeam.BLACK && board [i + k, j ].piece != UnitType.KING) {
+									if (board [i + k, j ].piece == UnitType.NULL) {
+										highlights++;
+										int newVal = makeCall (b, new Vector3 (i, 0, j), new Vector3 (i + k, 0, j ));
+										if (newVal != -200)
+											newVal = alphabeta (nodeVal, depth - 1, alpha, beta, false, getBoardAfterMove (b, new Vector3 (i, 0, j), new Vector3 (i  + k, 0, j )));
+										bestVal = Mathf.Max (newVal, bestVal);
+										alpha = Mathf.Max (alpha, bestVal);
+										if (beta <= alpha)
+											return bestVal;
+									}
+									breaker = true;
+									break;
+								}
+							}
+
+
+						}
+						else if (board [i, j].piece == UnitType.BISHOP) {////////////////////////////////////////////////////////////////////////////////
+
+						}
+						else if (board [i, j].piece == UnitType.QUEEN) {////////////////////////////////////////////////////////////////////////////////
+						}
+
+						
 					}
 				}
 			}
+			if (highlights == 0)
+				return -1000;
+			return bestVal;
 		} else {
 			bestVal = int.MaxValue;
 			for (int i = 0; i < 8; i++) {
@@ -105,6 +664,9 @@ public class BoardStructure {
 
 				}
 			}
+			if (highlights == 0)
+				return -1000;
+			return bestVal;
 		}
 	}
 
